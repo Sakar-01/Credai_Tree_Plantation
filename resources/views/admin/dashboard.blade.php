@@ -78,11 +78,12 @@
                             <h5>Quick Actions</h5>
                         </div>
                         <div class="card-body">
-                            <a href="{{ route('admin.analytics') }}" class="btn btn-primary me-2">View Analytics</a>
-                            <a href="{{ route('admin.volunteers') }}" class="btn btn-success me-2">Manage Volunteers</a>
-                            <a href="{{ route('admin.overdue-inspections') }}" class="btn btn-warning me-2">Overdue Inspections</a>
-                            <a href="{{ route('admin.export') }}?type=trees&format=csv" class="btn btn-info me-2">Export Trees</a>
-                            <a href="{{ route('trees.index') }}" class="btn btn-secondary">View All Trees</a>
+                            <a href="{{ route('admin.map') }}" class="btn btn-primary me-2">🗺️ Map View</a>
+                            <a href="{{ route('admin.analytics') }}" class="btn btn-info me-2">📊 Analytics</a>
+                            <a href="{{ route('admin.volunteers') }}" class="btn btn-success me-2">👥 Volunteers</a>
+                            <a href="{{ route('admin.overdue-inspections') }}" class="btn btn-warning me-2">⚠️ Overdue</a>
+                            <a href="{{ route('admin.export') }}?type=trees&format=csv" class="btn btn-secondary me-2">📄 Export</a>
+                            <a href="{{ route('trees.index') }}" class="btn btn-outline-secondary">🌳 All Trees</a>
                         </div>
                     </div>
                 </div>

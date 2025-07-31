@@ -28,5 +28,6 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/analytics', [AdminDashboardController::class, 'analytics'])->name('analytics');
     Route::get('/volunteers', [AdminDashboardController::class, 'volunteers'])->name('volunteers');
     Route::get('/overdue-inspections', [AdminDashboardController::class, 'overdueInspections'])->name('overdue-inspections');
+    Route::get('/map', [AdminDashboardController::class, 'mapView'])->name('map');
     Route::get('/export', [AdminDashboardController::class, 'exportData'])->name('export');
 });

@@ -81,6 +81,23 @@ class AdminDashboardController extends Controller
         return view('admin.overdue-inspections', compact('overdueTrees'));
     }
 
+    public function mapView()
+    {
+        $trees = Tree::with(['plantedBy', 'latestInspection'])
+            ->select('id', 'tree_id', 'species', 'location_description', 'latitude', 'longitude', 'status', 'plantation_date', 'planted_by')
+            ->get();
+
+        $stats = [
+            'total_trees' => $trees->count(),
+            'healthy_trees' => $trees->where('status', 'healthy')->count(),
+            'needs_attention' => $trees->where('status', 'needs_attention')->count(),
+            'under_inspection' => $trees->where('status', 'under_inspection')->count(),
+            'planted' => $trees->where('status', 'planted')->count(),
+        ];
+
+        return view('admin.map', compact('trees', 'stats'));
+    }
+
     public function exportData(Request $request)
     {
         $type = $request->get('type', 'trees');

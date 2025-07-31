@@ -130,17 +130,18 @@
         </div>
 
         <div class="col-md-4">
-            <!-- Map placeholder -->
+            <!-- Interactive Map -->
             <div class="card">
                 <div class="card-header">
                     <h6>Location Map</h6>
                 </div>
-                <div class="card-body">
-                    <div id="map" style="height: 300px; background: #e9ecef; display: flex; align-items: center; justify-content: center;">
-                        <p class="text-muted">Map integration can be added here<br>
-                        Lat: {{ $tree->latitude }}<br>
-                        Lng: {{ $tree->longitude }}</p>
-                    </div>
+                <div class="card-body p-0">
+                    <div id="treeMap" style="height: 300px; width: 100%;"></div>
+                </div>
+                <div class="card-footer">
+                    <small class="text-muted">
+                        📍 {{ $tree->latitude }}, {{ $tree->longitude }}
+                    </small>
                 </div>
             </div>
 
@@ -169,4 +170,65 @@
         </div>
     </div>
 </div>
+
+<script>
+let treeMap;
+
+function initTreeMap() {
+    const treeLocation = { 
+        lat: {{ $tree->latitude }}, 
+        lng: {{ $tree->longitude }} 
+    };
+    
+    treeMap = new google.maps.Map(document.getElementById('treeMap'), {
+        zoom: 15,
+        center: treeLocation,
+        mapTypeId: 'hybrid'
+    });
+
+    const marker = new google.maps.Marker({
+        position: treeLocation,
+        map: treeMap,
+        title: '{{ $tree->tree_id }} - {{ $tree->species }}',
+        icon: {
+            path: google.maps.SymbolPath.CIRCLE,
+            fillColor: getTreeStatusColor('{{ $tree->status }}'),
+            fillOpacity: 0.8,
+            strokeColor: '#ffffff',
+            strokeWeight: 2,
+            scale: 10
+        }
+    });
+
+    const infoWindow = new google.maps.InfoWindow({
+        content: `
+            <div style="min-width: 200px;">
+                <h6><strong>{{ $tree->tree_id }}</strong></h6>
+                <p><strong>Species:</strong> {{ $tree->species }}<br>
+                   <strong>Location:</strong> {{ $tree->location_description }}<br>
+                   <strong>Status:</strong> {{ ucfirst(str_replace('_', ' ', $tree->status)) }}<br>
+                   <strong>Planted:</strong> {{ $tree->plantation_date->format('M d, Y') }}
+                </p>
+            </div>
+        `
+    });
+
+    marker.addListener('click', () => {
+        infoWindow.open(treeMap, marker);
+    });
+}
+
+function getTreeStatusColor(status) {
+    const colors = {
+        'healthy': '#28a745',
+        'needs_attention': '#dc3545',
+        'under_inspection': '#ffc107',
+        'planted': '#6c757d',
+        'dead': '#000000'
+    };
+    return colors[status] || '#6c757d';
+}
+</script>
+
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBvsbRmU1nrJiiVgHekSmZrkvQDiowP6zw&callback=initTreeMap"></script>
 @endsection
