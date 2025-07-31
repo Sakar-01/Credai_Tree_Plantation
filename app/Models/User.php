@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable
 {
@@ -21,6 +22,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
+        'phone',
+        'assigned_region',
     ];
 
     /**
@@ -44,5 +48,30 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function plantedTrees(): HasMany
+    {
+        return $this->hasMany(Tree::class, 'planted_by');
+    }
+
+    public function inspections(): HasMany
+    {
+        return $this->hasMany(Inspection::class, 'inspected_by');
+    }
+
+    public function plantations(): HasMany
+    {
+        return $this->hasMany(Plantation::class, 'created_by');
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isVolunteer(): bool
+    {
+        return $this->role === 'volunteer';
     }
 }
