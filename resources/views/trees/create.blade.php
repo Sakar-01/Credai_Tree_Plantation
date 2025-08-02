@@ -33,9 +33,12 @@
 
                         <div class="mb-3">
                             <label for="location_description" class="form-label">Location Description *</label>
-                            <input type="text" class="form-control @error('location_description') is-invalid @enderror" 
-                                   id="location_description" name="location_description" value="{{ old('location_description') }}" 
-                                   placeholder="Village/Area name" required>
+                            <div class="position-relative">
+                                <input type="text" class="form-control @error('location_description') is-invalid @enderror" 
+                                       id="location_description" name="location_description" value="{{ old('location_description') }}" 
+                                       placeholder="Start typing location name..." required autocomplete="off">
+                                <div id="location_suggestions" class="dropdown-menu w-100" style="display: none;"></div>
+                            </div>
                             @error('location_description')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -134,6 +137,77 @@ document.getElementById('plantation_date').addEventListener('change', function()
     nextInspectionDate.setDate(nextInspectionDate.getDate() + 30);
     
     document.getElementById('next_inspection_date').value = nextInspectionDate.toISOString().split('T')[0];
+});
+
+// Location autocomplete functionality
+let debounceTimer;
+const locationInput = document.getElementById('location_description');
+const suggestionsContainer = document.getElementById('location_suggestions');
+
+locationInput.addEventListener('input', function() {
+    const query = this.value.trim();
+    
+    clearTimeout(debounceTimer);
+    
+    if (query.length < 2) {
+        suggestionsContainer.style.display = 'none';
+        return;
+    }
+    
+    debounceTimer = setTimeout(() => {
+        fetch(`/api/location-suggestions?query=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(suggestions => {
+                showSuggestions(suggestions);
+            })
+            .catch(error => {
+                console.error('Error fetching suggestions:', error);
+                suggestionsContainer.style.display = 'none';
+            });
+    }, 300);
+});
+
+function showSuggestions(suggestions) {
+    if (suggestions.length === 0) {
+        suggestionsContainer.style.display = 'none';
+        return;
+    }
+    
+    suggestionsContainer.innerHTML = '';
+    
+    suggestions.forEach(suggestion => {
+        const suggestionItem = document.createElement('a');
+        suggestionItem.className = 'dropdown-item d-flex justify-content-between align-items-center';
+        suggestionItem.href = '#';
+        suggestionItem.innerHTML = `
+            <span>${suggestion.location}</span>
+            <small class="text-muted">${suggestion.tree_count} trees</small>
+        `;
+        
+        suggestionItem.addEventListener('click', function(e) {
+            e.preventDefault();
+            locationInput.value = suggestion.location;
+            suggestionsContainer.style.display = 'none';
+        });
+        
+        suggestionsContainer.appendChild(suggestionItem);
+    });
+    
+    suggestionsContainer.style.display = 'block';
+}
+
+// Hide suggestions when clicking outside
+document.addEventListener('click', function(event) {
+    if (!locationInput.contains(event.target) && !suggestionsContainer.contains(event.target)) {
+        suggestionsContainer.style.display = 'none';
+    }
+});
+
+// Hide suggestions on escape key
+locationInput.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        suggestionsContainer.style.display = 'none';
+    }
 });
 </script>
 @endsection

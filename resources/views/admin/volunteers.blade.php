@@ -7,6 +7,9 @@
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h1>Volunteer Management</h1>
                 <div>
+                    <button type="button" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#addVolunteerModal">
+                        Add Volunteer
+                    </button>
                     <a href="{{ route('admin.export') }}?type=volunteers&format=csv" class="btn btn-success">Export Volunteers</a>
                     <a href="{{ route('admin.dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
                 </div>
@@ -80,7 +83,120 @@
     </div>
 </div>
 
+<!-- Add Volunteer Modal -->
+<div class="modal fade" id="addVolunteerModal" tabindex="-1" aria-labelledby="addVolunteerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addVolunteerModalLabel">Add New Volunteer</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route('admin.volunteers.store') }}" method="POST">
+                @csrf
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Full Name *</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email Address *</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">Phone Number</label>
+                        <input type="tel" class="form-control" id="phone" name="phone">
+                    </div>
+                    <div class="mb-3">
+                        <label for="assigned_region" class="form-label">Assigned Region</label>
+                        <div class="position-relative">
+                            <input type="text" class="form-control" id="assigned_region" name="assigned_region" 
+                                   placeholder="Start typing location name..." autocomplete="off">
+                            <div id="region_suggestions" class="dropdown-menu w-100" style="display: none;"></div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password *</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password_confirmation" class="form-label">Confirm Password *</label>
+                        <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Volunteer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <!-- Volunteer Detail Modals -->
+<!-- JavaScript for location autocomplete -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const regionInput = document.getElementById('assigned_region');
+    const suggestionsContainer = document.getElementById('region_suggestions');
+    const locations = @json($locations);
+    
+    regionInput.addEventListener('input', function() {
+        const query = this.value.trim().toLowerCase();
+        
+        if (query.length < 1) {
+            suggestionsContainer.style.display = 'none';
+            return;
+        }
+        
+        const filteredLocations = locations.filter(location => 
+            location.toLowerCase().includes(query)
+        );
+        
+        showSuggestions(filteredLocations);
+    });
+    
+    function showSuggestions(suggestions) {
+        if (suggestions.length === 0) {
+            suggestionsContainer.style.display = 'none';
+            return;
+        }
+        
+        suggestionsContainer.innerHTML = '';
+        
+        suggestions.forEach(suggestion => {
+            const suggestionItem = document.createElement('a');
+            suggestionItem.className = 'dropdown-item';
+            suggestionItem.href = '#';
+            suggestionItem.textContent = suggestion;
+            
+            suggestionItem.addEventListener('click', function(e) {
+                e.preventDefault();
+                regionInput.value = suggestion;
+                suggestionsContainer.style.display = 'none';
+            });
+            
+            suggestionsContainer.appendChild(suggestionItem);
+        });
+        
+        suggestionsContainer.style.display = 'block';
+    }
+    
+    // Hide suggestions when clicking outside
+    document.addEventListener('click', function(event) {
+        if (!regionInput.contains(event.target) && !suggestionsContainer.contains(event.target)) {
+            suggestionsContainer.style.display = 'none';
+        }
+    });
+    
+    // Hide suggestions on escape key
+    regionInput.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            suggestionsContainer.style.display = 'none';
+        }
+    });
+});
+</script>
+
 @foreach($volunteers as $volunteer)
 <div class="modal fade" id="volunteerModal{{ $volunteer->id }}" tabindex="-1" aria-labelledby="volunteerModalLabel{{ $volunteer->id }}" aria-hidden="true">
     <div class="modal-dialog modal-lg">
