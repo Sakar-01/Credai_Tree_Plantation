@@ -36,9 +36,9 @@
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ route('admin.dashboard') }}">Dashboard</a>
                                 </li>
-                                <li class="nav-item">
+                                {{-- <li class="nav-item">
                                     <a class="nav-link" href="{{ route('admin.map') }}">Map View</a>
-                                </li>
+                                </li> --}}
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ route('admin.analytics') }}">Analytics</a>
                                 </li>

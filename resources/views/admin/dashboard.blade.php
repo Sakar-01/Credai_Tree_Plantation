@@ -78,7 +78,7 @@
                             <h5>Quick Actions</h5>
                         </div>
                         <div class="card-body">
-                            <a href="{{ route('admin.map') }}" class="btn btn-primary me-2">🗺️ Map View</a>
+                            {{-- <a href="{{ route('admin.map') }}" class="btn btn-primary me-2">🗺️ Map View</a> --}}
                             <a href="{{ route('admin.analytics') }}" class="btn btn-info me-2">📊 Analytics</a>
                             <a href="{{ route('admin.location-analytics') }}" class="btn btn-success me-2">📍 Location Analytics</a>
                             <a href="{{ route('admin.volunteers') }}" class="btn btn-success me-2">👥 Volunteers</a>

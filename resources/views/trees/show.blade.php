@@ -40,6 +40,12 @@
                                     <th>Location:</th>
                                     <td>{{ $tree->location_description }}</td>
                                 </tr>
+                                @if($tree->landmark)
+                                <tr>
+                                    <th>Landmark:</th>
+                                    <td>{{ $tree->landmark }}</td>
+                                </tr>
+                                @endif
                                 <tr>
                                     <th>Coordinates:</th>
                                     <td>{{ $tree->latitude }}, {{ $tree->longitude }}</td>
@@ -76,7 +82,7 @@
                             @if($tree->plantation_survey_file)
                                 <div class="mt-3">
                                     <a href="{{ asset('storage/' . $tree->plantation_survey_file) }}" class="btn btn-sm btn-outline-info" target="_blank">
-                                        View Survey File
+                                        View Image
                                     </a>
                                 </div>
                             @endif
@@ -131,7 +137,7 @@
 
         <div class="col-md-4">
             <!-- Interactive Map -->
-            <div class="card">
+            {{-- <div class="card">
                 <div class="card-header">
                     <h6>Location Map</h6>
                 </div>
@@ -143,7 +149,7 @@
                         📍 {{ $tree->latitude }}, {{ $tree->longitude }}
                     </small>
                 </div>
-            </div>
+            </div> --}}
 
             <!-- Quick Actions -->
             <div class="card mt-3">

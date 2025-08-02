@@ -18,12 +18,12 @@
                                     <img src="{{ asset('storage/' . $tree->photo_path) }}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="Tree Photo">
                                 @endif
                                 <div class="card-body">
-                                    <h5 class="card-title">{{ $tree->tree_id }}</h5>
+                                    <h5 class="card-title"><strong> Species: {{ $tree->species }}</strong> </h5>
                                     <p class="card-text">
-                                        <strong>Species:</strong> {{ $tree->species }}<br>
-                                        <strong>Location:</strong> {{ $tree->location_description }}<br>
-                                        <strong>Planted:</strong> {{ $tree->plantation_date->format('M d, Y') }}<br>
-                                        <strong>Status:</strong> 
+                                        Tree Id - {{ $tree->tree_id }}<br>
+                                        Location: {{ $tree->location_description }}<br>
+                                        Planted: {{ $tree->plantation_date->format('M d, Y') }}<br>
+                                        Status: 
                                         <span class="badge bg-{{ $tree->status === 'healthy' ? 'success' : ($tree->status === 'needs_attention' ? 'danger' : 'secondary') }}">
                                             {{ ucfirst(str_replace('_', ' ', $tree->status)) }}
                                         </span>

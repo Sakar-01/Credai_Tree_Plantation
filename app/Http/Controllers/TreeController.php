@@ -36,13 +36,14 @@ class TreeController extends Controller
         $validated = $request->validate([
             'species' => 'required|string|max:255',
             'location_description' => 'required|string|max:255',
+            'landmark' => 'nullable|string|max:255',
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
             'plantation_date' => 'required|date',
             'next_inspection_date' => 'required|date|after:plantation_date',
             'photo' => 'required|image|mimes:jpeg,png,jpg|max:2048',
             'description' => 'nullable|string',
-            'plantation_survey_file' => 'nullable|file|mimes:pdf,doc,docx|max:5120',
+            'plantation_survey_file' => 'nullable|file|max:5120',
         ]);
 
         $photoPath = $request->file('photo')->store('tree-photos', 'public');
@@ -56,6 +57,7 @@ class TreeController extends Controller
             'tree_id' => 'TREE-' . strtoupper(Str::random(8)),
             'species' => $validated['species'],
             'location_description' => $validated['location_description'],
+            'landmark' => $validated['landmark'],
             'latitude' => $validated['latitude'],
             'longitude' => $validated['longitude'],
             'plantation_date' => $validated['plantation_date'],

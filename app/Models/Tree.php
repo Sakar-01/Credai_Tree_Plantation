@@ -12,6 +12,7 @@ class Tree extends Model
         'tree_id',
         'species',
         'location_description',
+        'landmark',
         'latitude',
         'longitude',
         'plantation_date',

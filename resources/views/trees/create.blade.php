@@ -44,6 +44,16 @@
                             @enderror
                         </div>
 
+                        <div class="mb-3">
+                            <label for="landmark" class="form-label">Nearby Landmark</label>
+                            <input type="text" class="form-control @error('landmark') is-invalid @enderror" 
+                                   id="landmark" name="landmark" value="{{ old('landmark') }}" 
+                                   placeholder="e.g., Near Main Gate, Behind School Building">
+                            @error('landmark')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="latitude" class="form-label">Latitude *</label>
@@ -97,9 +107,9 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="plantation_survey_file" class="form-label">Plantation Survey File</label>
+                            <label for="plantation_survey_file" class="form-label">Plantation File</label>
                             <input type="file" class="form-control @error('plantation_survey_file') is-invalid @enderror" 
-                                   id="plantation_survey_file" name="plantation_survey_file" accept=".pdf,.doc,.docx">
+                                   id="plantation_survey_file" name="plantation_survey_file">
                             @error('plantation_survey_file')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
