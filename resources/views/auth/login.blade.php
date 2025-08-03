@@ -64,7 +64,8 @@
     <div class="login-form-container col-12 col-sm-8 col-md-6 col-lg-4">
         <div class="card login-card shadow-lg">
             <div class="card-header bg-transparent border-0 text-center py-4">
-                <h4 class="mb-0 text-dark fw-bold">{{ __('Login') }}</h4>
+                <img src="{{ asset('images/logo.png') }}" alt="Tree Plantation Monitor" class="mb-3" style="max-height: 80px; width: auto;">
+                {{-- <h4 class="mb-0 text-dark fw-bold">{{ __('Login') }}</h4> --}}
             </div>
 
             <div class="card-body p-4">
@@ -117,7 +118,7 @@
                     @endif
                 </form>
 
-                volunteer@treeplantation.org password123
+                volunteer@treeplantation.org password123 <br/>
                 admin@treeplantation.org password123
             </div>
         </div>
