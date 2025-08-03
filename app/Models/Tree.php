@@ -11,6 +11,7 @@ class Tree extends Model
     protected $fillable = [
         'tree_id',
         'species',
+        'location_id',
         'location_description',
         'landmark',
         'latitude',
@@ -30,6 +31,11 @@ class Tree extends Model
         'latitude' => 'decimal:8',
         'longitude' => 'decimal:8',
     ];
+
+    public function location(): BelongsTo
+    {
+        return $this->belongsTo(Location::class);
+    }
 
     public function plantedBy(): BelongsTo
     {

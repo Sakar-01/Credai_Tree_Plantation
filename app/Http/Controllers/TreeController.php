@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Tree;
+use App\Models\Location;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -16,14 +17,40 @@ class TreeController extends Controller
 
     public function index()
     {
+        $locations = Location::withCount(['trees' => function ($query) {
+                if (auth()->user()->isVolunteer()) {
+                    $query->where('planted_by', auth()->id());
+                }
+            }])
+            ->whereHas('trees', function ($query) {
+                if (auth()->user()->isVolunteer()) {
+                    $query->where('planted_by', auth()->id());
+                }
+            })
+            ->with(['trees' => function ($query) {
+                if (auth()->user()->isVolunteer()) {
+                    $query->where('planted_by', auth()->id());
+                }
+            }])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('trees.index', compact('locations'));
+    }
+
+    public function locationTrees($locationId)
+    {
+        $location = Location::findOrFail($locationId);
+
         $trees = Tree::with(['plantedBy', 'latestInspection'])
+            ->where('location_id', $location->id)
             ->when(auth()->user()->isVolunteer(), function ($query) {
                 return $query->where('planted_by', auth()->id());
             })
             ->orderBy('created_at', 'desc')
             ->paginate(15);
 
-        return view('trees.index', compact('trees'));
+        return view('trees.location', compact('trees', 'location'));
     }
 
     public function create()

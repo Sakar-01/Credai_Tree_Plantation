@@ -16,6 +16,7 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 
 Route::middleware('auth')->group(function () {
     Route::resource('trees', TreeController::class);
+    Route::get('/location/{location}/trees', [TreeController::class, 'locationTrees'])->name('trees.location');
     Route::resource('inspections', InspectionController::class);
     
     Route::get('/inspections/upcoming/list', [InspectionController::class, 'upcomingInspections'])
