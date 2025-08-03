@@ -48,14 +48,25 @@
                             @enderror
                         </div>
 
-                        <div class="mb-3">
-                            <label for="next_inspection_date" class="form-label">Next Inspection Date *</label>
-                            <input type="date" class="form-control @error('next_inspection_date') is-invalid @enderror" 
-                                   id="next_inspection_date" name="next_inspection_date" 
-                                   value="{{ old('next_inspection_date', $tree->next_inspection_date->format('Y-m-d')) }}" required>
-                            @error('next_inspection_date')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="height" class="form-label">Tree Height</label>
+                                <input type="text" class="form-control @error('height') is-invalid @enderror" 
+                                       id="height" name="height" value="{{ old('height', $tree->height) }}" 
+                                       placeholder="e.g., 2.5 meters">
+                                @error('height')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-md-6">
+                                <label for="next_inspection_date" class="form-label">Next Inspection Date *</label>
+                                <input type="date" class="form-control @error('next_inspection_date') is-invalid @enderror" 
+                                       id="next_inspection_date" name="next_inspection_date" 
+                                       value="{{ old('next_inspection_date', $tree->next_inspection_date->format('Y-m-d')) }}" required>
+                                @error('next_inspection_date')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
                         </div>
 
                         <div class="mb-3">
@@ -74,10 +85,11 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="description" class="form-label">Description</label>
-                            <textarea class="form-control @error('description') is-invalid @enderror" 
-                                      id="description" name="description" rows="3">{{ old('description', $tree->description) }}</textarea>
-                            @error('description')
+                            <label for="tree_description" class="form-label">Tree Description</label>
+                            <textarea class="form-control @error('tree_description') is-invalid @enderror" 
+                                      id="tree_description" name="tree_description" rows="3" 
+                                      placeholder="Additional details about this specific tree">{{ old('tree_description', $tree->tree_description) }}</textarea>
+                            @error('tree_description')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>

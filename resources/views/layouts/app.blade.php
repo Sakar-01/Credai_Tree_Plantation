@@ -48,7 +48,7 @@
                                 </li>
                             @endif
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ route('trees.index') }}">My Trees</a>
+                                <a class="nav-link" href="{{ route('plantation-drives.index') }}">Plantation Drives</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ route('inspections.upcoming') }}">Inspections</a>

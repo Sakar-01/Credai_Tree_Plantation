@@ -25,6 +25,11 @@ class Location extends Model
         return $this->hasMany(Tree::class);
     }
 
+    public function plantationDrives(): HasMany
+    {
+        return $this->hasMany(PlantationDrive::class);
+    }
+
     public function getTreeCountAttribute()
     {
         return $this->trees()->count();

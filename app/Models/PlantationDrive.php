@@ -6,26 +6,22 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Tree extends Model
+class PlantationDrive extends Model
 {
     protected $fillable = [
-        'tree_id',
-        'species',
+        'drive_id',
+        'title',
+        'description',
         'location_id',
-        'plantation_drive_id',
-        'location_description',
-        'landmark',
-        'latitude',
-        'longitude',
+        'number_of_trees',
+        'images',
         'plantation_date',
         'next_inspection_date',
-        'photo_path',
-        'description',
+        'latitude',
+        'longitude',
         'plantation_survey_file',
-        'planted_by',
+        'created_by',
         'status',
-        'height',
-        'tree_description',
     ];
 
     protected $casts = [
@@ -33,6 +29,7 @@ class Tree extends Model
         'next_inspection_date' => 'date',
         'latitude' => 'decimal:8',
         'longitude' => 'decimal:8',
+        'images' => 'array',
     ];
 
     public function location(): BelongsTo
@@ -40,23 +37,18 @@ class Tree extends Model
         return $this->belongsTo(Location::class);
     }
 
-    public function plantationDrive(): BelongsTo
+    public function createdBy(): BelongsTo
     {
-        return $this->belongsTo(PlantationDrive::class);
+        return $this->belongsTo(User::class, 'created_by');
     }
 
-    public function plantedBy(): BelongsTo
+    public function trees(): HasMany
     {
-        return $this->belongsTo(User::class, 'planted_by');
+        return $this->hasMany(Tree::class);
     }
 
     public function inspections(): HasMany
     {
         return $this->hasMany(Inspection::class);
-    }
-
-    public function latestInspection(): HasMany
-    {
-        return $this->inspections()->latest('inspection_date');
     }
 }

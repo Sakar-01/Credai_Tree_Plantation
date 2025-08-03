@@ -17,21 +17,9 @@ class TreeController extends Controller
 
     public function index()
     {
-        $locations = Location::withCount(['trees' => function ($query) {
-                if (auth()->user()->isVolunteer()) {
-                    $query->where('planted_by', auth()->id());
-                }
-            }])
-            ->whereHas('trees', function ($query) {
-                if (auth()->user()->isVolunteer()) {
-                    $query->where('planted_by', auth()->id());
-                }
-            })
-            ->with(['trees' => function ($query) {
-                if (auth()->user()->isVolunteer()) {
-                    $query->where('planted_by', auth()->id());
-                }
-            }])
+        $locations = Location::withCount('trees')
+            ->whereHas('trees')
+            ->with('trees')
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -44,9 +32,6 @@ class TreeController extends Controller
 
         $trees = Tree::with(['plantedBy', 'latestInspection'])
             ->where('location_id', $location->id)
-            ->when(auth()->user()->isVolunteer(), function ($query) {
-                return $query->where('planted_by', auth()->id());
-            })
             ->orderBy('created_at', 'desc')
             ->paginate(15);
 
@@ -101,36 +86,25 @@ class TreeController extends Controller
 
     public function show(Tree $tree)
     {
-        $tree->load(['plantedBy', 'inspections.inspectedBy']);
-        
-        if (auth()->user()->isVolunteer() && $tree->planted_by !== auth()->id()) {
-            abort(403, 'You can only view trees you have planted.');
-        }
+        $tree->load(['plantedBy', 'inspections.inspectedBy', 'plantationDrive']);
 
         return view('trees.show', compact('tree'));
     }
 
     public function edit(Tree $tree)
     {
-        if (auth()->user()->isVolunteer() && $tree->planted_by !== auth()->id()) {
-            abort(403, 'You can only edit trees you have planted.');
-        }
-
         return view('trees.edit', compact('tree'));
     }
 
     public function update(Request $request, Tree $tree)
     {
-        if (auth()->user()->isVolunteer() && $tree->planted_by !== auth()->id()) {
-            abort(403, 'You can only edit trees you have planted.');
-        }
-
         $validated = $request->validate([
             'species' => 'required|string|max:255',
             'location_description' => 'required|string|max:255',
+            'height' => 'nullable|string|max:255',
+            'tree_description' => 'nullable|string',
             'next_inspection_date' => 'required|date',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'description' => 'nullable|string',
             'status' => 'required|in:planted,under_inspection,healthy,needs_attention,dead',
         ]);
 
@@ -149,10 +123,6 @@ class TreeController extends Controller
 
     public function destroy(Tree $tree)
     {
-        if (auth()->user()->isVolunteer()) {
-            abort(403, 'Only admins can delete trees.');
-        }
-
         if ($tree->photo_path) {
             Storage::disk('public')->delete($tree->photo_path);
         }

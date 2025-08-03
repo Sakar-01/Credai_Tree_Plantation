@@ -118,8 +118,8 @@
                     @endif
                 </form>
 
-                volunteer@treeplantation.org password123 <br/>
-                admin@treeplantation.org password123
+                volunteer@example.org password <br/>
+                admin@example.com password
             </div>
         </div>
     </div>
