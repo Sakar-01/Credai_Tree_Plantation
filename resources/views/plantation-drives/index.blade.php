@@ -31,8 +31,8 @@
                                     @endif
                                     <p class="card-text">
                                         <strong>{{ $location->plantation_drives_count }}</strong> {{ $location->plantation_drives_count == 1 ? 'drive' : 'drives' }}<br>
-                                        <strong>{{ $location->plantation_drives ? $location->plantation_drives->sum('number_of_trees') : 0 }}</strong> total trees planted<br>
-                                        <small class="text-muted">Latest drive: {{ $location->plantation_drives?->first()?->plantation_date?->format('M d, Y') ?? 'N/A' }}</small>
+                                        {{-- <strong>{{ $location->plantationDrives ? $location->plantationDrives->sum('number_of_trees') : 0 }}</strong> total trees planted<br>
+                                        <small class="text-muted">Latest drive: {{ $location->plantationDrives?->first()?->plantation_date?->format('M d, Y') ?? 'N/A' }}</small> --}}
                                     </p>
                                     <div class="mt-3">
                                         @php

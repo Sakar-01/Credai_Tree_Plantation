@@ -20,7 +20,7 @@ class PlantationDriveController extends Controller
     {
         $locations = Location::withCount('plantationDrives')
             ->whereHas('plantationDrives')
-            ->with('plantationDrives')
+            ->with(['plantationDrives', 'trees'])
             ->orderBy('created_at', 'desc')
             ->get();
 
