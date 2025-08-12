@@ -11,6 +11,7 @@ class Tree extends Model
     protected $fillable = [
         'tree_id',
         'species',
+        'height',
         'location_id',
         'landmark_id',
         'location_description',
@@ -20,6 +21,7 @@ class Tree extends Model
         'plantation_date',
         'next_inspection_date',
         'photo_path',
+        'images',
         'description',
         'plantation_survey_file',
         'planted_by',
@@ -31,6 +33,7 @@ class Tree extends Model
         'next_inspection_date' => 'date',
         'latitude' => 'decimal:8',
         'longitude' => 'decimal:8',
+        'images' => 'array',
     ];
 
     public function location(): BelongsTo

@@ -23,7 +23,7 @@
                     @endif
                 </div>
                 <div>
-                    <a href="{{ route('trees.create') }}" class="btn btn-primary">Plant New Tree</a>
+                    <a href="{{ route('locations.plant-tree', $location->id) }}" class="btn btn-primary">Plant New Tree</a>
                     <a href="{{ route('inspections.upcoming') }}" class="btn btn-warning">Upcoming Inspections</a>
                 </div>
             </div>
@@ -80,7 +80,7 @@
                 <div class="text-center">
                     <h3>No trees found in this location</h3>
                     <p class="text-muted">Be the first to plant a tree here!</p>
-                    <a href="{{ route('trees.create') }}" class="btn btn-primary btn-lg">Plant a Tree</a>
+                    <a href="{{ route('locations.plant-tree', $location->id) }}" class="btn btn-primary btn-lg">Plant a Tree</a>
                 </div>
             @endif
         </div>

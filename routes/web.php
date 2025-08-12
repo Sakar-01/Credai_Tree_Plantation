@@ -19,6 +19,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/location/{location}/trees', [TreeController::class, 'locationTrees'])->name('trees.location');
     Route::resource('inspections', InspectionController::class);
     
+    // Location routes
+    Route::get('/locations/create', [App\Http\Controllers\LocationController::class, 'create'])->name('locations.create');
+    Route::post('/locations', [App\Http\Controllers\LocationController::class, 'store'])->name('locations.store');
+    Route::get('/locations/{location}/plant-tree', [App\Http\Controllers\LocationController::class, 'plantTreeForm'])->name('locations.plant-tree');
+    Route::post('/locations/{location}/plant-tree', [App\Http\Controllers\LocationController::class, 'plantTree'])->name('locations.plant-tree.store');
+    
     Route::get('/inspections/upcoming/list', [InspectionController::class, 'upcomingInspections'])
         ->name('inspections.upcoming');
     Route::get('/trees/{tree}/inspect', [InspectionController::class, 'create'])

@@ -12,11 +12,13 @@ class Location extends Model
         'description',
         'latitude',
         'longitude',
+        'images',
     ];
 
     protected $casts = [
         'latitude' => 'decimal:8',
         'longitude' => 'decimal:8',
+        'images' => 'array',
     ];
 
     public function trees(): HasMany
