@@ -72,7 +72,7 @@ class LocationController extends Controller
         
         $validated = $request->validate([
             'species' => 'nullable|string|max:255',
-            'height' => 'nullable|numeric|min:0|max:999.99',
+            'height' => 'nullable|numeric|min:0|max:99999',
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
             'landmark' => 'nullable|string|max:255',

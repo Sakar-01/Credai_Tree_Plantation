@@ -43,10 +43,10 @@
                                 @enderror
                             </div>
                             <div class="col-md-6">
-                                <label for="height" class="form-label">Plant Height (meters)</label>
-                                <input type="number" step="0.01" class="form-control @error('height') is-invalid @enderror" 
+                                <label for="height" class="form-label">Plant Height (cm)</label>
+                                <input type="number" step="0.1" class="form-control @error('height') is-invalid @enderror" 
                                        id="height" name="height" value="{{ old('height') }}" 
-                                       placeholder="e.g., 0.5, 1.2" min="0" max="999.99">
+                                       placeholder="e.g., 50, 120, 200" min="0" max="99999">
                                 @error('height')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror

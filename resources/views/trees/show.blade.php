@@ -74,6 +74,12 @@
                                     <th>Species:</th>
                                     <td>{{ $tree->species }}</td>
                                 </tr>
+                                @if($tree->height)
+                                <tr>
+                                    <th>Plant Height:</th>
+                                    <td>{{ $tree->height }} cm</td>
+                                </tr>
+                                @endif
                                 <tr>
                                     <th>Location:</th>
                                     <td>{{ $tree->location_description }}</td>

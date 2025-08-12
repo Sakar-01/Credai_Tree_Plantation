@@ -78,6 +78,7 @@
                 </div>
             </div> --}}
 
+            <a href="{{ route('admin.location-analytics') }}" class="btn btn-success me-2">📍 Location Analytics</a>
             <!-- Quick Actions -->
             {{-- <div class="row mb-4">
                 <div class="col-md-12">
@@ -87,7 +88,6 @@
                         </div>
                         <div class="card-body">
                             <a href="{{ route('admin.analytics') }}" class="btn btn-info me-2">📊 Analytics</a>
-                            <a href="{{ route('admin.location-analytics') }}" class="btn btn-success me-2">📍 Location Analytics</a>
                             <a href="{{ route('admin.volunteers') }}" class="btn btn-success me-2">👥 Volunteers</a>
                             <a href="{{ route('admin.overdue-inspections') }}" class="btn btn-warning me-2">⚠️ Overdue</a>
                             <a href="{{ route('admin.export') }}?type=trees&format=csv" class="btn btn-secondary me-2">📄 Export</a>

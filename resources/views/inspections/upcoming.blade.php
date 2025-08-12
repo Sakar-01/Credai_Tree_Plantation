@@ -56,6 +56,9 @@
                                     <h5 class="card-title"><strong> Species: {{ $tree->species }}</strong> </h5>
                                     <p class="card-text">
                                         Tree Id - {{ $tree->tree_id }}<br>
+                                        @if($tree->height)
+                                            Height: {{ $tree->height }} cm<br>
+                                        @endif
                                         Location: {{ $tree->location_description }}<br>
                                         Planted: {{ $tree->plantation_date->format('M d, Y') }}<br>
                                         Status: 
