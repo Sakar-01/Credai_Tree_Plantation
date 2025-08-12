@@ -27,6 +27,8 @@ Route::middleware('auth')->group(function () {
     
     Route::get('/inspections/upcoming/list', [InspectionController::class, 'upcomingInspections'])
         ->name('inspections.upcoming');
+    Route::get('/inspections/upcoming/location/{location}', [InspectionController::class, 'upcomingInspectionsByLocation'])
+        ->name('inspections.upcoming.location');
     Route::get('/trees/{tree}/inspect', [InspectionController::class, 'create'])
         ->name('trees.inspect');
     

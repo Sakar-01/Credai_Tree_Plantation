@@ -5,8 +5,17 @@
     <div class="row">
         <div class="col-md-12">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1>Upcoming Inspections</h1>
-                <a href="{{ route('trees.index') }}" class="btn btn-secondary">Back to Trees</a>
+                <div>
+                    <h1>Upcoming Inspections</h1>
+                    @if(isset($location))
+                        <p class="text-muted mb-0">
+                            <i class="fas fa-map-marker-alt"></i> {{ $location->name }}
+                        </p>
+                    @endif
+                </div>
+                <a href="{{ isset($location) ? route('trees.location', $location->id) : route('trees.index') }}" class="btn btn-secondary">
+                    {{ isset($location) ? 'Back to Location' : 'Back to Trees' }}
+                </a>
             </div>
 
             @if($upcomingTrees->count() > 0)
@@ -49,8 +58,16 @@
             @else
                 <div class="text-center">
                     <h3>No upcoming inspections</h3>
-                    <p class="text-muted">All your trees are up to date with inspections!</p>
-                    <a href="{{ route('trees.index') }}" class="btn btn-primary">View All Trees</a>
+                    <p class="text-muted">
+                        @if(isset($location))
+                            All trees in {{ $location->name }} are up to date with inspections!
+                        @else
+                            All your trees are up to date with inspections!
+                        @endif
+                    </p>
+                    <a href="{{ isset($location) ? route('trees.location', $location->id) : route('trees.index') }}" class="btn btn-primary">
+                        {{ isset($location) ? 'View Location Trees' : 'View All Trees' }}
+                    </a>
                 </div>
             @endif
         </div>

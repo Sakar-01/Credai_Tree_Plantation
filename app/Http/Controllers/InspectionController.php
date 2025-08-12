@@ -39,6 +39,22 @@ class InspectionController extends Controller
         return view('inspections.upcoming', compact('upcomingTrees'));
     }
 
+    public function upcomingInspectionsByLocation($locationId)
+    {
+        $location = \App\Models\Location::findOrFail($locationId);
+        
+        $upcomingTrees = Tree::where('location_id', $locationId)
+            ->where('next_inspection_date', '<=', now()->addDays(7))
+            ->when(auth()->user()->isVolunteer(), function ($query) {
+                return $query->where('planted_by', auth()->id());
+            })
+            ->with(['plantedBy', 'latestInspection'])
+            ->orderBy('next_inspection_date', 'asc')
+            ->get();
+
+        return view('inspections.upcoming', compact('upcomingTrees', 'location'));
+    }
+
     public function create(Tree $tree)
     {
         if (auth()->user()->isVolunteer() && $tree->planted_by !== auth()->id()) {
