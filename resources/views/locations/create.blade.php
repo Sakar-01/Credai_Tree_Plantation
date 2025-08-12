@@ -64,6 +64,9 @@
                             <button type="button" class="btn btn-sm btn-outline-primary" onclick="getCurrentLocation()">
                                 <i class="fas fa-location-arrow"></i> Use Current Location
                             </button>
+                            <small class="form-text text-muted d-block mt-1">
+                                Note: Your browser must allow location access and you may need HTTPS for this feature to work.
+                            </small>
                         </div>
 
                         <div class="mb-3">
@@ -168,17 +171,74 @@ function updateCoordinates(lat, lng) {
 }
 
 function getCurrentLocation() {
+    const button = document.querySelector('button[onclick="getCurrentLocation()"]');
+    const originalText = button.innerHTML;
+    
+    // Show loading state
+    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Getting location...';
+    button.disabled = true;
+    
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(position) {
-            const location = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-            map.setCenter(location);
-            map.setZoom(17);
-            placeMarker(location);
-        }, function(error) {
-            alert('Error getting location: ' + error.message);
-        });
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                // Success callback
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                const location = new google.maps.LatLng(lat, lng);
+                
+                // Update map
+                map.setCenter(location);
+                map.setZoom(17);
+                placeMarker(location);
+                
+                // Ensure coordinates are displayed
+                document.getElementById('latitude').value = lat.toFixed(8);
+                document.getElementById('longitude').value = lng.toFixed(8);
+                
+                // Reset button
+                button.innerHTML = '<i class="fas fa-check"></i> Location detected!';
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                }, 2000);
+            },
+            function(error) {
+                // Error callback
+                let errorMessage = 'Error getting location: ';
+                switch(error.code) {
+                    case error.PERMISSION_DENIED:
+                        errorMessage += 'Location access denied by user. Please enable location permissions and try again.';
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        errorMessage += 'Location information is unavailable.';
+                        break;
+                    case error.TIMEOUT:
+                        errorMessage += 'Location request timed out.';
+                        break;
+                    default:
+                        errorMessage += 'An unknown error occurred.';
+                        break;
+                }
+                
+                alert(errorMessage);
+                
+                // Reset button
+                button.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Failed to get location';
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                }, 3000);
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 60000
+            }
+        );
     } else {
         alert('Geolocation is not supported by this browser.');
+        button.innerHTML = originalText;
+        button.disabled = false;
     }
 }
 

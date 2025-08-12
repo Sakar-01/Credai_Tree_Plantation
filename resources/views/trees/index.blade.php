@@ -64,7 +64,7 @@
                                         <strong>{{ $location->trees_count }}</strong> {{ $location->trees_count == 1 ? 'tree' : 'trees' }} planted<br>
                                         <small class="text-muted">Last planted: {{ $location->latest_plantation_date ? \Carbon\Carbon::parse($location->latest_plantation_date)->format('M d, Y') : 'N/A' }}</small>
                                     </p>
-                                    <div class="mt-3">
+                                    {{-- <div class="mt-3">
                                         @php
                                             $healthyCount = $location->trees->where('status', 'healthy')->count();
                                             $needsAttentionCount = $location->trees->where('status', 'needs_attention')->count();
@@ -79,7 +79,7 @@
                                         @if($otherCount > 0)
                                             <span class="badge bg-secondary">{{ $otherCount }} Other</span>
                                         @endif
-                                    </div>
+                                    </div> --}}
                                 </div>
                                 <div class="card-footer bg-transparent">
                                     <small class="text-muted">Click to view trees in this location</small>

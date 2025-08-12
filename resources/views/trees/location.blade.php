@@ -47,7 +47,7 @@
                                     <h5 class="card-title"><strong> Species: {{ $tree->species }}</strong> </h5>
                                     <p class="card-text">
                                         Tree Id - {{ $tree->tree_id }}<br>
-                                        @if($tree->landmark_id && $tree->landmark)
+                                        @if($tree->landmark_id && is_object($tree->landmark))
                                             Landmark: {{ $tree->landmark->name }}<br>
                                         @elseif($tree->landmark)
                                             Landmark: {{ $tree->landmark }}<br>

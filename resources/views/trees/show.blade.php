@@ -137,7 +137,7 @@
 
         <div class="col-md-4">
             <!-- Interactive Map -->
-            {{-- <div class="card">
+            <div class="card">
                 <div class="card-header">
                     <h6>Location Map</h6>
                 </div>
@@ -149,7 +149,7 @@
                         📍 {{ $tree->latitude }}, {{ $tree->longitude }}
                     </small>
                 </div>
-            </div> --}}
+            </div>
 
             <!-- Quick Actions -->
             <div class="card mt-3">
@@ -158,6 +158,12 @@
                 </div>
                 <div class="card-body">
                     <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-primary" onclick="getDirections()">
+                            <i class="fas fa-directions"></i> Get Directions
+                        </button>
+                        <button type="button" class="btn btn-outline-primary" onclick="openInGoogleMaps()">
+                            <i class="fas fa-external-link-alt"></i> Open in Google Maps
+                        </button>
                         @if($tree->next_inspection_date <= now())
                             <a href="{{ route('trees.inspect', $tree) }}" class="btn btn-warning">Inspect Now</a>
                         @endif
@@ -197,13 +203,11 @@ function initTreeMap() {
         map: treeMap,
         title: '{{ $tree->tree_id }} - {{ $tree->species }}',
         icon: {
-            path: google.maps.SymbolPath.CIRCLE,
-            fillColor: getTreeStatusColor('{{ $tree->status }}'),
-            fillOpacity: 0.8,
-            strokeColor: '#ffffff',
-            strokeWeight: 2,
-            scale: 10
-        }
+      text: '🌳',
+      fontSize: '24px',
+      fontFamily: 'Arial',
+      color: '#28a745'
+  }
     });
 
     const infoWindow = new google.maps.InfoWindow({
@@ -234,7 +238,78 @@ function getTreeStatusColor(status) {
     };
     return colors[status] || '#6c757d';
 }
+
+// Navigation functions
+function openInGoogleMaps() {
+    const lat = {{ $tree->latitude }};
+    const lng = {{ $tree->longitude }};
+    const treeId = '{{ $tree->tree_id }}';
+    const species = '{{ $tree->species }}';
+    
+    // Create Google Maps URL with the tree location
+    const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}&query_place_id=${treeId}`;
+    window.open(url, '_blank');
+}
+
+function getDirections() {
+    const lat = {{ $tree->latitude }};
+    const lng = {{ $tree->longitude }};
+    const treeId = '{{ $tree->tree_id }}';
+    
+    if (navigator.geolocation) {
+        // Show loading state
+        const button = document.querySelector('button[onclick="getDirections()"]');
+        const originalText = button.innerHTML;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Getting location...';
+        button.disabled = true;
+        
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                // Success - got user location
+                const userLat = position.coords.latitude;
+                const userLng = position.coords.longitude;
+                
+                // Create Google Maps directions URL
+                const directionsUrl = `https://www.google.com/maps/dir/${userLat},${userLng}/${lat},${lng}`;
+                window.open(directionsUrl, '_blank');
+                
+                // Reset button
+                button.innerHTML = originalText;
+                button.disabled = false;
+            },
+            function(error) {
+                // Error getting location - open maps without origin
+                console.warn('Could not get user location:', error.message);
+                
+                // Fallback: open Google Maps with destination only
+                const mapsUrl = `https://www.google.com/maps/dir//${lat},${lng}`;
+                window.open(mapsUrl, '_blank');
+                
+                // Reset button
+                button.innerHTML = originalText;
+                button.disabled = false;
+                
+                // Show user-friendly message
+                if (error.code === error.PERMISSION_DENIED) {
+                    alert('Location access denied. Opening Google Maps - you can set your starting location manually.');
+                } else {
+                    alert('Could not detect your location. Opening Google Maps - you can set your starting location manually.');
+                }
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 60000
+            }
+        );
+    } else {
+        // Geolocation not supported
+        alert('Geolocation is not supported by your browser. Opening Google Maps - you can set your starting location manually.');
+        const mapsUrl = `https://www.google.com/maps/dir//${lat},${lng}`;
+        window.open(mapsUrl, '_blank');
+    }
+}
 </script>
 
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBvsbRmU1nrJiiVgHekSmZrkvQDiowP6zw&callback=initTreeMap"></script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&callback=initTreeMap"></script>
 @endsection
