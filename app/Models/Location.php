@@ -9,7 +9,6 @@ class Location extends Model
 {
     protected $fillable = [
         'name',
-        'landmark',
         'description',
         'latitude',
         'longitude',
@@ -23,6 +22,11 @@ class Location extends Model
     public function trees(): HasMany
     {
         return $this->hasMany(Tree::class);
+    }
+
+    public function landmarks(): HasMany
+    {
+        return $this->hasMany(Landmark::class);
     }
 
     public function getTreeCountAttribute()

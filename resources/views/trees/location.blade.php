@@ -13,8 +13,13 @@
                         </ol>
                     </nav>
                     <h1>Trees in {{ $location->name }}</h1>
-                    @if($location->landmark)
-                        <p class="text-muted"><i class="fas fa-landmark"></i> {{ $location->landmark }}</p>
+                    @if($location->landmarks->count() > 0)
+                        <p class="text-muted">
+                            <i class="fas fa-landmark"></i> 
+                            @foreach($location->landmarks as $landmark)
+                                {{ $landmark->name }}@if(!$loop->last), @endif
+                            @endforeach
+                        </p>
                     @endif
                 </div>
                 <div>
@@ -42,7 +47,9 @@
                                     <h5 class="card-title"><strong> Species: {{ $tree->species }}</strong> </h5>
                                     <p class="card-text">
                                         Tree Id - {{ $tree->tree_id }}<br>
-                                        @if($tree->landmark)
+                                        @if($tree->landmark_id && $tree->landmark)
+                                            Landmark: {{ $tree->landmark->name }}<br>
+                                        @elseif($tree->landmark)
                                             Landmark: {{ $tree->landmark }}<br>
                                         @endif
                                         Planted: {{ $tree->plantation_date->format('M d, Y') }}<br>

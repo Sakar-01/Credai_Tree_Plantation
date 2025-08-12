@@ -31,7 +31,7 @@ class TreeController extends Controller
                 if (auth()->user()->isVolunteer()) {
                     $query->where('planted_by', auth()->id());
                 }
-            }])
+            }, 'landmarks'])
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -40,9 +40,9 @@ class TreeController extends Controller
 
     public function locationTrees($locationId)
     {
-        $location = Location::findOrFail($locationId);
+        $location = Location::with('landmarks')->findOrFail($locationId);
 
-        $trees = Tree::with(['plantedBy', 'latestInspection'])
+        $trees = Tree::with(['plantedBy', 'latestInspection', 'landmark'])
             ->where('location_id', $location->id)
             ->when(auth()->user()->isVolunteer(), function ($query) {
                 return $query->where('planted_by', auth()->id());
@@ -86,14 +86,26 @@ class TreeController extends Controller
             'longitude' => $validated['longitude'],
         ], [
             'name' => $validated['location_description'],
-            'landmark' => $validated['landmark'],
             'description' => $validated['location_description'],
         ]);
+
+        // Create landmark if provided
+        $landmarkId = null;
+        if (!empty($validated['landmark'])) {
+            $landmark = Landmark::firstOrCreate([
+                'name' => $validated['landmark'],
+                'location_id' => $location->id,
+            ], [
+                'description' => 'Landmark near ' . $validated['location_description'],
+            ]);
+            $landmarkId = $landmark->id;
+        }
 
         $tree = Tree::create([
             'tree_id' => 'TREE-' . strtoupper(Str::random(8)),
             'species' => $validated['species'],
             'location_id' => $location->id,
+            'landmark_id' => $landmarkId,
             'location_description' => $validated['location_description'],
             'landmark' => $validated['landmark'],
             'latitude' => $validated['latitude'],

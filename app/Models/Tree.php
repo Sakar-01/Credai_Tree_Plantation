@@ -12,6 +12,7 @@ class Tree extends Model
         'tree_id',
         'species',
         'location_id',
+        'landmark_id',
         'location_description',
         'landmark',
         'latitude',
@@ -35,6 +36,11 @@ class Tree extends Model
     public function location(): BelongsTo
     {
         return $this->belongsTo(Location::class);
+    }
+
+    public function landmark(): BelongsTo
+    {
+        return $this->belongsTo(Landmark::class);
     }
 
     public function plantedBy(): BelongsTo

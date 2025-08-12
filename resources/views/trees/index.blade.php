@@ -26,8 +26,13 @@
                             <div class="card h-100 location-card" style="cursor: pointer;" onclick="window.location.href='{{ route('trees.location', $location->id) }}'">
                                 <div class="card-body">
                                     <h5 class="card-title">{{ $location->name }}</h5>
-                                    @if($location->landmark)
-                                        <p class="text-muted mb-2"><i class="fas fa-landmark"></i> {{ $location->landmark }}</p>
+                                    @if($location->landmarks->count() > 0)
+                                        <p class="text-muted mb-2">
+                                            <i class="fas fa-landmark"></i> 
+                                            @foreach($location->landmarks as $landmark)
+                                                {{ $landmark->name }}@if(!$loop->last), @endif
+                                            @endforeach
+                                        </p>
                                     @endif
                                     <p class="card-text">
                                         <strong>{{ $location->trees_count }}</strong> {{ $location->trees_count == 1 ? 'tree' : 'trees' }} planted<br>
