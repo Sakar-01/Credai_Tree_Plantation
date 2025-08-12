@@ -152,10 +152,8 @@
     </div>
 </div>
 
-<script async defer src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&callback=initGoogleMaps"></script>
-
 <script>
-// Global callback function that Google Maps can always find
+// Global callback function that Google Maps can always find - MUST be defined before loading Google Maps
 window.initGoogleMaps = function() {
     if (typeof initMap === 'function') {
         initMap();
@@ -164,6 +162,8 @@ window.initGoogleMaps = function() {
     }
 };
 </script>
+
+<script async defer src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&callback=initGoogleMaps"></script>
 
 <script>
 let map;

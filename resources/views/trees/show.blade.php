@@ -312,16 +312,35 @@ function getDirections() {
 }
 </script>
 
-<script async defer src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&callback=initGoogleMaps"></script>
-
 <script>
-// Global callback function that Google Maps can always find
+// Global callback function that Google Maps can always find - MUST be defined before loading Google Maps
 window.initGoogleMaps = function() {
-    if (typeof initTreeMap === 'function') {
-        initTreeMap();
-    } else {
-        console.warn('initTreeMap function not found');
-    }
+    // Add a small delay to ensure all scripts have loaded
+    setTimeout(function() {
+        if (typeof initTreeMap === 'function') {
+            try {
+                initTreeMap();
+            } catch (error) {
+                console.error('Error initializing tree map:', error);
+            }
+        } else {
+            console.warn('initTreeMap function not found, retrying...');
+            // Retry once after a short delay
+            setTimeout(function() {
+                if (typeof initTreeMap === 'function') {
+                    try {
+                        initTreeMap();
+                    } catch (error) {
+                        console.error('Error initializing tree map on retry:', error);
+                    }
+                } else {
+                    console.error('initTreeMap function still not found after retry');
+                }
+            }, 100);
+        }
+    }, 50);
 };
 </script>
+
+<script async defer src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&callback=initGoogleMaps"></script>
 @endsection

@@ -24,9 +24,15 @@
                         
                         <div class="mb-3">
                             <label for="name" class="form-label">Location Name *</label>
-                            <input type="text" class="form-control @error('name') is-invalid @enderror" 
-                                   id="name" name="name" value="{{ old('name') }}" required
-                                   placeholder="e.g., Central Park, School Garden">
+                            <div class="position-relative">
+                                <input type="text" class="form-control @error('name') is-invalid @enderror" 
+                                       id="name" name="name" value="{{ old('name') }}" required
+                                       placeholder="e.g., Central Park, School Garden">
+                                <div id="name_update_indicator" class="position-absolute top-50 end-0 translate-middle-y me-2" style="display: none;">
+                                    <i class="fas fa-check text-success"></i>
+                                </div>
+                            </div>
+                            <small class="form-text text-muted">Auto-updates when you change the location description</small>
                             @error('name')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -39,8 +45,11 @@
                                        id="description" name="description" value="{{ old('description') }}" 
                                        placeholder="Search for locations in Jalgaon..." required autocomplete="off">
                                 <div id="location_suggestions" class="dropdown-menu w-100" style="display: none;"></div>
+                                <div id="search_loading" class="position-absolute top-50 end-0 translate-middle-y me-3" style="display: none;">
+                                    <i class="fas fa-spinner fa-spin text-primary"></i>
+                                </div>
                             </div>
-                            <small class="form-text text-muted">Start typing to search for locations in Jalgaon</small>
+                            <small class="form-text text-muted">Start typing to search for locations in Jalgaon - this will auto-update the name and coordinates</small>
                             @error('description')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -105,18 +114,37 @@
     </div>
 </div>
 
-<script async defer src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&libraries=places&callback=initGoogleMaps"></script>
-
 <script>
-// Global callback function that Google Maps can always find
+// Global callback function that Google Maps can always find - MUST be defined before loading Google Maps
 window.initGoogleMaps = function() {
-    if (typeof initMap === 'function') {
-        initMap();
-    } else {
-        console.warn('initMap function not found');
-    }
+    // Add a small delay to ensure all scripts have loaded
+    setTimeout(function() {
+        if (typeof initMap === 'function') {
+            try {
+                initMap();
+            } catch (error) {
+                console.error('Error initializing map:', error);
+            }
+        } else {
+            console.warn('initMap function not found, retrying...');
+            // Retry once after a short delay
+            setTimeout(function() {
+                if (typeof initMap === 'function') {
+                    try {
+                        initMap();
+                    } catch (error) {
+                        console.error('Error initializing map on retry:', error);
+                    }
+                } else {
+                    console.error('initMap function still not found after retry');
+                }
+            }, 100);
+        }
+    }, 50);
 };
 </script>
+
+<script async defer src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&libraries=places&callback=initGoogleMaps"></script>
 
 <script>
 let map;
@@ -168,15 +196,43 @@ window.initMap = function initMap() {
 
     autocomplete.addListener('place_changed', function() {
         const place = autocomplete.getPlace();
+        console.log('Autocomplete place selected:', place);
+        
         if (place.geometry && place.geometry.location) {
-            const location = place.geometry.location;
-            map.setCenter(location);
-            map.setZoom(17);
-            placeMarker(location);
-            
-            // Update name if not already filled
-            if (!document.getElementById('name').value) {
-                document.getElementById('name').value = place.name || place.formatted_address;
+            updateLocationFromPlace(place);
+        } else {
+            console.warn('Selected place has no geometry:', place);
+            // If autocomplete selection doesn't have geometry, try searching for it
+            if (place.name) {
+                searchForPlace(place.name);
+            }
+        }
+    });
+
+    // Handle manual input in description field
+    const descriptionInput = document.getElementById('description');
+    let searchTimeout;
+    
+    descriptionInput.addEventListener('input', function() {
+        const query = this.value.trim();
+        
+        // Clear previous timeout
+        clearTimeout(searchTimeout);
+        
+        // Only search if user has typed at least 3 characters
+        if (query.length >= 3) {
+            searchTimeout = setTimeout(function() {
+                searchForPlace(query);
+            }, 300); // Reduced to 300ms for faster response
+        } else {
+            // Hide loading indicator if query is too short
+            document.getElementById('search_loading').style.display = 'none';
+            // Clear location name and coordinates if query is too short
+            if (query.length === 0) {
+                document.getElementById('name').value = '';
+                document.getElementById('latitude').value = '';
+                document.getElementById('longitude').value = '';
+                hideDuplicateWarning();
             }
         }
     });
@@ -193,6 +249,110 @@ function updateCoordinates(lat, lng) {
     
     // Check for duplicate locations
     checkForDuplicateLocation(lat, lng);
+}
+
+function searchForPlace(query) {
+    if (!window.google || !window.google.maps) {
+        console.warn('Google Maps not loaded yet');
+        return;
+    }
+
+    // Show loading indicator
+    document.getElementById('search_loading').style.display = 'block';
+    console.log('Searching for place:', query);
+
+    const service = new google.maps.places.PlacesService(map);
+    
+    // Try text search first
+    const textSearchRequest = {
+        query: query + ' Jalgaon Maharashtra', // Add location context
+        bounds: new google.maps.LatLngBounds(
+            new google.maps.LatLng(20.5, 75.0), // Southwest corner of Jalgaon region
+            new google.maps.LatLng(21.5, 76.0)  // Northeast corner of Jalgaon region
+        ),
+        fields: ['name', 'formatted_address', 'geometry', 'place_id', 'vicinity']
+    };
+    
+    service.textSearch(textSearchRequest, function(results, status) {
+        console.log('Text search status:', status, 'Results:', results);
+        
+        if (status === google.maps.places.PlacesServiceStatus.OK && results && results.length > 0) {
+            const place = results[0];
+            updateLocationFromPlace(place);
+        } else {
+            // If text search fails, try nearby search as fallback
+            console.log('Text search failed, trying nearby search...');
+            tryNearbySearch(query);
+        }
+    });
+}
+
+function tryNearbySearch(query) {
+    const service = new google.maps.places.PlacesService(map);
+    
+    // Use Jalgaon center for nearby search
+    const jalgaonCenter = new google.maps.LatLng(21.0077, 75.5626);
+    
+    const nearbyRequest = {
+        location: jalgaonCenter,
+        radius: 50000, // 50km radius
+        keyword: query,
+        fields: ['name', 'formatted_address', 'geometry', 'place_id', 'vicinity']
+    };
+    
+    service.nearbySearch(nearbyRequest, function(results, status) {
+        // Hide loading indicator
+        document.getElementById('search_loading').style.display = 'none';
+        
+        console.log('Nearby search status:', status, 'Results:', results);
+        
+        if (status === google.maps.places.PlacesServiceStatus.OK && results && results.length > 0) {
+            const place = results[0];
+            updateLocationFromPlace(place);
+        } else {
+            console.log('Both text and nearby search failed for:', query);
+            // Clear fields if no results found
+            document.getElementById('name').value = query; // At least use the query as name
+        }
+    });
+}
+
+function updateLocationFromPlace(place) {
+    // Hide loading indicator
+    document.getElementById('search_loading').style.display = 'none';
+    
+    console.log('Updating location from place:', place);
+    
+    if (place.geometry && place.geometry.location) {
+        const location = place.geometry.location;
+        
+        // Update map
+        map.setCenter(location);
+        map.setZoom(17);
+        placeMarker(location);
+        
+        // Update location name with priority: name > vicinity > formatted_address
+        const placeName = place.name || place.vicinity || place.formatted_address || 'Unknown Location';
+        console.log('Setting location name to:', placeName);
+        
+        const nameField = document.getElementById('name');
+        const nameIndicator = document.getElementById('name_update_indicator');
+        
+        nameField.value = placeName;
+        
+        // Show success indicator
+        nameIndicator.style.display = 'block';
+        setTimeout(() => {
+            nameIndicator.style.display = 'none';
+        }, 2000); // Hide after 2 seconds
+        
+        // Update coordinates
+        updateCoordinates(location.lat(), location.lng());
+        
+        console.log('Location updated successfully');
+    } else {
+        console.warn('Place has no geometry/location:', place);
+    }
 }
 
 function checkForDuplicateLocation(lat, lng) {
