@@ -118,14 +118,19 @@
                             <label for="images" class="form-label">Tree Images *</label>
                             <input type="file" class="form-control @error('images.*') is-invalid @enderror" 
                                    id="images" name="images[]" accept="image/*" multiple required>
-                            <small class="form-text text-muted">Upload multiple images of the planted tree (JPEG, PNG, JPG - Max 2MB each)</small>
+                            <small class="form-text text-muted">Upload multiple images of the planted tree (JPEG, PNG, JPG - Max 5MB each)</small>
                             @error('images.*')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
 
                         <div id="image_preview" class="mb-3" style="display: none;">
-                            <label class="form-label">Image Preview:</label>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label class="form-label mb-0">Image Preview:</label>
+                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="clearAllImages()">
+                                    <i class="fas fa-times"></i> Clear All Images
+                                </button>
+                            </div>
                             <div id="preview_container" class="row"></div>
                         </div>
 
@@ -243,24 +248,39 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('plantation_date').dispatchEvent(new Event('change'));
 });
 
+// Store selected files globally for manipulation
+let selectedFiles = [];
+
 // Image preview functionality
 document.getElementById('images').addEventListener('change', function(e) {
-    const files = e.target.files;
+    const files = Array.from(e.target.files);
+    selectedFiles = [...files]; // Store files
+    updateImagePreview();
+});
+
+function updateImagePreview() {
     const previewContainer = document.getElementById('preview_container');
     const imagePreview = document.getElementById('image_preview');
     
     previewContainer.innerHTML = '';
     
-    if (files.length > 0) {
+    if (selectedFiles.length > 0) {
         imagePreview.style.display = 'block';
         
-        Array.from(files).forEach(file => {
+        selectedFiles.forEach((file, index) => {
             const reader = new FileReader();
             reader.onload = function(e) {
                 const col = document.createElement('div');
                 col.className = 'col-md-3 mb-2';
                 col.innerHTML = `
-                    <img src="${e.target.result}" class="img-thumbnail" style="height: 100px; width: 100%; object-fit: cover;">
+                    <div class="position-relative">
+                        <img src="${e.target.result}" class="img-thumbnail" style="height: 100px; width: 100%; object-fit: cover;">
+                        <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1" 
+                                onclick="removeImage(${index})" style="border-radius: 50%; width: 30px; height: 30px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-times" style="font-size: 14px; color: white;"></i>
+                        </button>
+                        <small class="d-block text-center mt-1 text-muted">${file.name}</small>
+                    </div>
                 `;
                 previewContainer.appendChild(col);
             };
@@ -269,6 +289,30 @@ document.getElementById('images').addEventListener('change', function(e) {
     } else {
         imagePreview.style.display = 'none';
     }
-});
+    
+    // Update the file input
+    updateFileInput();
+}
+
+function removeImage(index) {
+    selectedFiles.splice(index, 1);
+    updateImagePreview();
+}
+
+function clearAllImages() {
+    selectedFiles = [];
+    updateImagePreview();
+}
+
+function updateFileInput() {
+    const fileInput = document.getElementById('images');
+    const dt = new DataTransfer();
+    
+    selectedFiles.forEach(file => {
+        dt.items.add(file);
+    });
+    
+    fileInput.files = dt.files;
+}
 </script>
 @endsection

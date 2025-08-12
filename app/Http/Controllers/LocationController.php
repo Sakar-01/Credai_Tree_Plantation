@@ -26,7 +26,7 @@ class LocationController extends Controller
             'description' => 'required|string|max:1000',
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
-            'images.*' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
         ]);
 
         // Check if location already exists
@@ -79,7 +79,7 @@ class LocationController extends Controller
             'plantation_date' => 'required|date',
             'next_inspection_date' => 'required|date|after:plantation_date',
             'description' => 'nullable|string',
-            'images.*' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'images.*' => 'required|image|mimes:jpeg,png,jpg|max:5120',
         ]);
 
         // Handle multiple image uploads for tree
