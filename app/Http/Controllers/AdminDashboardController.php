@@ -24,7 +24,19 @@ class AdminDashboardController extends Controller
         $recentInspections = Inspection::with(['tree', 'inspectedBy'])->latest()->take(5)->get();
         $overdueInspections = Tree::where('next_inspection_date', '<', now())->count();
         
-        return view('admin.dashboard', compact('stats', 'recentTrees', 'recentInspections', 'overdueInspections'));
+        // Location Analytics Data
+        $locationStats = Tree::select('location_description')
+            ->selectRaw('COUNT(*) as tree_count')
+            ->selectRaw('AVG(latitude) as avg_latitude')
+            ->selectRaw('AVG(longitude) as avg_longitude')
+            ->groupBy('location_description')
+            ->orderBy('tree_count', 'desc')
+            ->take(10) // Limit to top 10 locations
+            ->get();
+
+        $totalLocations = Tree::distinct('location_description')->count('location_description');
+        
+        return view('admin.dashboard', compact('stats', 'recentTrees', 'recentInspections', 'overdueInspections', 'locationStats', 'totalLocations'));
     }
 
     public function analytics(Request $request)

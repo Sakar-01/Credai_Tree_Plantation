@@ -40,14 +40,67 @@
                         </div>
                     </div>
                 </div>
-                {{-- <div class="col-md-3">
-                    <div class="card bg-warning text-white">
+            </div>
+
+            <!-- Location Analytics Cards -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card bg-dark text-white">
                         <div class="card-body">
-                            <h5 class="card-title">Trees This Month</h5>
-                            <h2>{{ $stats['trees_this_month'] }}</h2>
+                            <h5 class="card-title">Total Locations</h5>
+                            <h2>{{ $totalLocations }}</h2>
                         </div>
                     </div>
-                </div> --}}
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Top Locations by Tree Count</h5>
+                        </div>
+                        <div class="card-body">
+                            @if($locationStats->count() > 0)
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Location</th>
+                                                <th>Trees</th>
+                                                {{-- <th>%</th> --}}
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($locationStats->take(5) as $location)
+                                            <tr>
+                                                <td>
+                                                    <small>{{ Str::limit($location->location_description, 25) }}</small>
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-primary">{{ $location->tree_count }}</span>
+                                                </td>
+                                                {{-- <td>
+                                                    <div class="progress" style="height: 15px; width: 60px;">
+                                                        <div class="progress-bar" role="progressbar" 
+                                                             style="width: {{ ($location->tree_count / $stats['total_trees']) * 100 }}%">
+                                                        </div>
+                                                    </div>
+                                                    <small>{{ number_format(($location->tree_count / $stats['total_trees']) * 100, 1) }}%</small>
+                                                </td> --}}
+                                            </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="mt-2">
+                                    <a href="{{ route('admin.location-analytics') }}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-chart-bar"></i> View Full Analytics
+                                    </a>
+                                </div>
+                            @else
+                                <p class="text-muted mb-0">No location data available</p>
+                            @endif
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Health Status Row -->
@@ -78,7 +131,7 @@
                 </div>
             </div> --}}
 
-            <a href="{{ route('admin.location-analytics') }}" class="btn btn-success me-2">📍 Location Analytics</a>
+            {{-- <a href="{{ route('admin.location-analytics') }}" class="btn btn-success me-2">📍 Location Analytics</a> --}}
             <!-- Quick Actions -->
             {{-- <div class="row mb-4">
                 <div class="col-md-12">
