@@ -33,17 +33,25 @@
                     </div>
                 </div>
                 <div class="col-md-3">
+                    <div class="card bg-dark text-white">
+                        <div class="card-body">
+                            <h5 class="card-title">Overdue Inspections</h5>
+                            <h2>{{ $overdueInspections }}</h2>
+                        </div>
+                    </div>
+                </div>
+                {{-- <div class="col-md-3">
                     <div class="card bg-warning text-white">
                         <div class="card-body">
                             <h5 class="card-title">Trees This Month</h5>
                             <h2>{{ $stats['trees_this_month'] }}</h2>
                         </div>
                     </div>
-                </div>
+                </div> --}}
             </div>
 
             <!-- Health Status Row -->
-            <div class="row mb-4">
+            {{-- <div class="row mb-4">
                 <div class="col-md-4">
                     <div class="card bg-success text-white">
                         <div class="card-body">
@@ -68,17 +76,16 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> --}}
 
             <!-- Quick Actions -->
-            <div class="row mb-4">
+            {{-- <div class="row mb-4">
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-header">
                             <h5>Quick Actions</h5>
                         </div>
                         <div class="card-body">
-                            {{-- <a href="{{ route('admin.map') }}" class="btn btn-primary me-2">🗺️ Map View</a> --}}
                             <a href="{{ route('admin.analytics') }}" class="btn btn-info me-2">📊 Analytics</a>
                             <a href="{{ route('admin.location-analytics') }}" class="btn btn-success me-2">📍 Location Analytics</a>
                             <a href="{{ route('admin.volunteers') }}" class="btn btn-success me-2">👥 Volunteers</a>
@@ -88,10 +95,10 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> --}}
 
             <!-- Recent Trees and Inspections -->
-            <div class="row">
+            {{-- <div class="row">
                 <div class="col-md-6">
                     <div class="card">
                         <div class="card-header">
@@ -167,7 +174,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> --}}
         </div>
     </div>
 </div>

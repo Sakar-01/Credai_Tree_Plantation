@@ -80,9 +80,20 @@ class TreeController extends Controller
             $surveyFilePath = $request->file('plantation_survey_file')->store('survey-files', 'public');
         }
 
+        // Find or create location based on coordinates and description
+        $location = Location::firstOrCreate([
+            'latitude' => $validated['latitude'],
+            'longitude' => $validated['longitude'],
+        ], [
+            'name' => $validated['location_description'],
+            'landmark' => $validated['landmark'],
+            'description' => $validated['location_description'],
+        ]);
+
         $tree = Tree::create([
             'tree_id' => 'TREE-' . strtoupper(Str::random(8)),
             'species' => $validated['species'],
+            'location_id' => $location->id,
             'location_description' => $validated['location_description'],
             'landmark' => $validated['landmark'],
             'latitude' => $validated['latitude'],
