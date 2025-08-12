@@ -152,13 +152,25 @@
     </div>
 </div>
 
-<script async defer src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&callback=initMap"></script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&callback=initGoogleMaps"></script>
+
+<script>
+// Global callback function that Google Maps can always find
+window.initGoogleMaps = function() {
+    if (typeof initMap === 'function') {
+        initMap();
+    } else {
+        console.warn('initMap function not found');
+    }
+};
+</script>
 
 <script>
 let map;
 let marker;
 
-function initMap() {
+// Ensure function is globally available
+window.initMap = function initMap() {
     const locationCenter = { lat: {{ $location->latitude }}, lng: {{ $location->longitude }} };
     
     map = new google.maps.Map(document.getElementById('map'), {

@@ -186,7 +186,8 @@
 <script>
 let treeMap;
 
-function initTreeMap() {
+// Ensure function is globally available
+window.initTreeMap = function initTreeMap() {
     const treeLocation = { 
         lat: {{ $tree->latitude }}, 
         lng: {{ $tree->longitude }} 
@@ -311,5 +312,16 @@ function getDirections() {
 }
 </script>
 
-<script async defer src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&callback=initTreeMap"></script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&callback=initGoogleMaps"></script>
+
+<script>
+// Global callback function that Google Maps can always find
+window.initGoogleMaps = function() {
+    if (typeof initTreeMap === 'function') {
+        initTreeMap();
+    } else {
+        console.warn('initTreeMap function not found');
+    }
+};
+</script>
 @endsection

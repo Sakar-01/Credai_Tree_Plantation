@@ -105,14 +105,26 @@
     </div>
 </div>
 
-<script async defer src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&libraries=places&callback=initMap"></script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&libraries=places&callback=initGoogleMaps"></script>
+
+<script>
+// Global callback function that Google Maps can always find
+window.initGoogleMaps = function() {
+    if (typeof initMap === 'function') {
+        initMap();
+    } else {
+        console.warn('initMap function not found');
+    }
+};
+</script>
 
 <script>
 let map;
 let marker;
 let autocomplete;
 
-function initMap() {
+// Ensure function is globally available
+window.initMap = function initMap() {
     // Default to Jalgaon coordinates
     const jalgaon = { lat: 21.0077, lng: 75.5626 };
     

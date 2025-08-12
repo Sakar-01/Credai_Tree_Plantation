@@ -122,7 +122,8 @@ const trees = @json($trees);
 // Jalgaon, India coordinates
 const JALGAON_CENTER = { lat: 21.0077, lng: 75.5626 };
 
-function initMap() {
+// Ensure function is globally available
+window.initMap = function initMap() {
     // Initialize map centered on Jalgaon, India
     map = new google.maps.Map(document.getElementById('map'), {
         zoom: 12,
@@ -308,7 +309,18 @@ window.addEventListener('resize', function() {
 </script>
 
 <!-- Load Google Maps API with Visualization Library -->
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBvsbRmU1nrJiiVgHekSmZrkvQDiowP6zw&libraries=visualization&callback=initMap"></script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&libraries=visualization&callback=initGoogleMaps"></script>
+
+<script>
+// Global callback function that Google Maps can always find
+window.initGoogleMaps = function() {
+    if (typeof initMap === 'function') {
+        initMap();
+    } else {
+        console.warn('initMap function not found');
+    }
+};
+</script>
 
 <style>
 .gm-style-iw {
