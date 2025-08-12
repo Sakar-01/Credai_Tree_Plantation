@@ -22,18 +22,27 @@ class TreeController extends Controller
                     $query->where('planted_by', auth()->id());
                 }
             }])
-            ->whereHas('trees', function ($query) {
-                if (auth()->user()->isVolunteer()) {
-                    $query->where('planted_by', auth()->id());
-                }
-            })
             ->with(['trees' => function ($query) {
                 if (auth()->user()->isVolunteer()) {
                     $query->where('planted_by', auth()->id());
                 }
+                $query->latest();
             }, 'landmarks'])
+            ->when(auth()->user()->isVolunteer(), function ($query) {
+                // For volunteers, only show locations where they have trees OR locations with no trees at all
+                $query->where(function ($subQuery) {
+                    $subQuery->whereHas('trees', function ($treeQuery) {
+                        $treeQuery->where('planted_by', auth()->id());
+                    })->orWhereDoesntHave('trees');
+                });
+            })
             ->orderBy('created_at', 'desc')
             ->get();
+
+        // Add latest plantation date for each location
+        $locations->each(function ($location) {
+            $location->latest_plantation_date = $location->trees->max('plantation_date');
+        });
 
         return view('trees.index', compact('locations'));
     }

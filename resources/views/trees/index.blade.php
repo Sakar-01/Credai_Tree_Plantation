@@ -62,7 +62,11 @@
                                     @endif
                                     <p class="card-text">
                                         <strong>{{ $location->trees_count }}</strong> {{ $location->trees_count == 1 ? 'tree' : 'trees' }} planted<br>
-                                        <small class="text-muted">Last planted: {{ $location->latest_plantation_date ? \Carbon\Carbon::parse($location->latest_plantation_date)->format('M d, Y') : 'N/A' }}</small>
+                                        @if($location->trees_count > 0)
+                                            <small class="text-muted">Last planted: {{ $location->latest_plantation_date ? \Carbon\Carbon::parse($location->latest_plantation_date)->format('M d, Y') : 'N/A' }}</small>
+                                        @else
+                                            <small class="text-success">Ready for tree planting!</small>
+                                        @endif
                                     </p>
                                     {{-- <div class="mt-3">
                                         @php
@@ -90,7 +94,7 @@
                 </div>
             @else
                 <div class="text-center">
-                    <h3>No locations with trees yet</h3>
+                    <h3>No locations found</h3>
                     <p class="text-muted">Start by adding your first location!</p>
                     <a href="{{ route('locations.create') }}" class="btn btn-primary btn-lg">Add Your First Location</a>
                 </div>
