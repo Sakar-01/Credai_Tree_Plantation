@@ -7,7 +7,7 @@ use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\LocationAnalyticsController;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('login');
 });
 
 Auth::routes();

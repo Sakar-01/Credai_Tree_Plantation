@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ config('app.name', 'Tree Plantation Monitor') }} - Login</title>
+    <title>{{ config('app.name', 'Credai') }} - Login</title>
     <link rel="dns-prefetch" href="//fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
@@ -81,7 +81,7 @@
     <div class="login-form-container col-12 col-sm-8 col-md-6 col-lg-4">
         <div class="card login-card shadow-lg">
             <div class="card-header bg-transparent border-0 text-center py-4">
-                <img src="{{ asset('images/logo.png') }}" alt="Tree Plantation Monitor" class="mb-3" style="max-height: 80px; width: auto;">
+                <img src="{{ asset('images/logo.png') }}" alt="Credai" class="mb-3" style="max-height: 80px; width: auto;">
                 {{-- <h4 class="mb-0 text-dark fw-bold">{{ __('Login') }}</h4> --}}
             </div>
 
