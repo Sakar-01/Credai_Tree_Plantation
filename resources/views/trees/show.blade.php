@@ -26,7 +26,45 @@
 
                     <div class="row">
                         <div class="col-md-6">
-                            @if($tree->photo_path)
+                            @if($tree->images && count($tree->images) > 0)
+                                <div id="treeDetailCarousel" class="carousel slide" data-bs-ride="carousel">
+                                    <div class="carousel-inner">
+                                        @foreach($tree->images as $index => $image)
+                                            <div class="carousel-item {{ $index == 0 ? 'active' : '' }}">
+                                                <img src="{{ asset('storage/' . $image) }}" 
+                                                     class="d-block w-100 rounded" 
+                                                     style="height: 400px; object-fit: cover;" 
+                                                     alt="Tree Photo {{ $index + 1 }}">
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                    @if(count($tree->images) > 1)
+                                        <button class="carousel-control-prev" type="button" data-bs-target="#treeDetailCarousel" data-bs-slide="prev">
+                                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                            <span class="visually-hidden">Previous</span>
+                                        </button>
+                                        <button class="carousel-control-next" type="button" data-bs-target="#treeDetailCarousel" data-bs-slide="next">
+                                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                            <span class="visually-hidden">Next</span>
+                                        </button>
+                                        <!-- Image counter -->
+                                        <div class="position-absolute bottom-0 start-0 m-3">
+                                            <span class="badge bg-dark bg-opacity-75">
+                                                <span id="currentImageIndex">1</span> / {{ count($tree->images) }}
+                                            </span>
+                                        </div>
+                                        <!-- Indicators -->
+                                        <div class="carousel-indicators">
+                                            @foreach($tree->images as $index => $image)
+                                                <button type="button" data-bs-target="#treeDetailCarousel" data-bs-slide-to="{{ $index }}" 
+                                                        class="{{ $index == 0 ? 'active' : '' }}" 
+                                                        aria-current="{{ $index == 0 ? 'true' : 'false' }}" 
+                                                        aria-label="Slide {{ $index + 1 }}"></button>
+                                            @endforeach
+                                        </div>
+                                    @endif
+                                </div>
+                            @elseif($tree->photo_path)
                                 <img src="{{ asset('storage/' . $tree->photo_path) }}" class="img-fluid rounded" alt="Tree Photo">
                             @endif
                         </div>
@@ -310,6 +348,19 @@ function getDirections() {
         window.open(mapsUrl, '_blank');
     }
 }
+
+// Update image counter for tree detail carousel
+document.addEventListener('DOMContentLoaded', function() {
+    const carousel = document.getElementById('treeDetailCarousel');
+    const imageCounter = document.getElementById('currentImageIndex');
+    
+    if (carousel && imageCounter) {
+        carousel.addEventListener('slid.bs.carousel', function (e) {
+            const activeIndex = e.to + 1;
+            imageCounter.textContent = activeIndex;
+        });
+    }
+});
 </script>
 
 <script>

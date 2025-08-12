@@ -128,7 +128,33 @@
                     @foreach($trees as $tree)
                         <div class="col-md-4 mb-4">
                             <div class="card">
-                                @if($tree->photo_path)
+                                @if($tree->images && count($tree->images) > 0)
+                                    <div id="treeCarousel{{ $tree->id }}" class="carousel slide" data-bs-ride="carousel">
+                                        <div class="carousel-inner">
+                                            @foreach($tree->images as $index => $image)
+                                                <div class="carousel-item {{ $index == 0 ? 'active' : '' }}">
+                                                    <img src="{{ asset('storage/' . $image) }}" 
+                                                         class="d-block w-100 card-img-top" 
+                                                         style="height: 200px; object-fit: cover;" 
+                                                         alt="Tree Photo {{ $index + 1 }}">
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                        @if(count($tree->images) > 1)
+                                            <button class="carousel-control-prev" type="button" data-bs-target="#treeCarousel{{ $tree->id }}" data-bs-slide="prev">
+                                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                                <span class="visually-hidden">Previous</span>
+                                            </button>
+                                            <button class="carousel-control-next" type="button" data-bs-target="#treeCarousel{{ $tree->id }}" data-bs-slide="next">
+                                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                                <span class="visually-hidden">Next</span>
+                                            </button>
+                                            <div class="position-absolute top-0 end-0 m-2">
+                                                <span class="badge bg-dark bg-opacity-75">{{ count($tree->images) }} photos</span>
+                                            </div>
+                                        @endif
+                                    </div>
+                                @elseif($tree->photo_path)
                                     <img src="{{ asset('storage/' . $tree->photo_path) }}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="Tree Photo">
                                 @endif
                                 <div class="card-body">
