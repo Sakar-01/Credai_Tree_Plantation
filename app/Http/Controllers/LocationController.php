@@ -127,4 +127,38 @@ class LocationController extends Controller
         return redirect()->route('trees.show', $tree)
             ->with('success', 'Tree planted successfully!');
     }
+
+    public function checkDuplicate(Request $request)
+    {
+        $lat = $request->get('lat');
+        $lng = $request->get('lng');
+        
+        if (!$lat || !$lng) {
+            return response()->json(['duplicate' => false]);
+        }
+        
+        // Check for locations within ~100 meters (approximately 0.001 degrees)
+        $tolerance = 0.001;
+        
+        $existingLocation = Location::where('latitude', '>=', $lat - $tolerance)
+            ->where('latitude', '<=', $lat + $tolerance)
+            ->where('longitude', '>=', $lng - $tolerance)
+            ->where('longitude', '<=', $lng + $tolerance)
+            ->first();
+            
+        if ($existingLocation) {
+            return response()->json([
+                'duplicate' => true,
+                'location' => [
+                    'id' => $existingLocation->id,
+                    'name' => $existingLocation->name,
+                    'description' => $existingLocation->description,
+                    'latitude' => $existingLocation->latitude,
+                    'longitude' => $existingLocation->longitude,
+                ]
+            ]);
+        }
+        
+        return response()->json(['duplicate' => false]);
+    }
 }

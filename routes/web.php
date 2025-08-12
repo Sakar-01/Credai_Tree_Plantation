@@ -31,6 +31,7 @@ Route::middleware('auth')->group(function () {
         ->name('trees.inspect');
     
     Route::get('/api/location-suggestions', [LocationAnalyticsController::class, 'getLocationSuggestions']);
+    Route::get('/api/locations/check-duplicate', [App\Http\Controllers\LocationController::class, 'checkDuplicate']);
 });
 
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {

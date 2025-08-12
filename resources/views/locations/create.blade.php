@@ -9,7 +9,17 @@
                     <h4>Add New Location</h4>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('locations.store') }}" method="POST" enctype="multipart/form-data">
+                    <!-- Duplicate Location Warning -->
+                    <div id="duplicate_warning" class="alert alert-danger" style="display: none;">
+                        <h6><i class="fas fa-ban"></i> Location Already Exists!</h6>
+                        <p>This location already exists. You cannot create duplicate locations.</p>
+                        <div id="existing_location_info"></div>
+                        <a id="goto_existing_location" href="#" class="btn btn-sm btn-primary">
+                            <i class="fas fa-map-marker-alt"></i> Go to Existing Location
+                        </a>
+                    </div>
+
+                    <form id="locationForm" action="{{ route('locations.store') }}" method="POST" enctype="multipart/form-data" onsubmit="return validateLocationForm(event)">
                         @csrf
                         
                         <div class="mb-3">
@@ -168,6 +178,107 @@ function placeMarker(location) {
 function updateCoordinates(lat, lng) {
     document.getElementById('latitude').value = lat.toFixed(8);
     document.getElementById('longitude').value = lng.toFixed(8);
+    
+    // Check for duplicate locations
+    checkForDuplicateLocation(lat, lng);
+}
+
+function checkForDuplicateLocation(lat, lng) {
+    // Only check if we have valid coordinates
+    if (!lat || !lng || lat === 0 || lng === 0) {
+        return;
+    }
+    
+    // Create a simple AJAX request to check for nearby locations
+    const csrfToken = document.querySelector('meta[name="csrf-token"]');
+    const headers = {
+        'Content-Type': 'application/json'
+    };
+    if (csrfToken) {
+        headers['X-CSRF-TOKEN'] = csrfToken.getAttribute('content');
+    }
+    
+    fetch(`/api/locations/check-duplicate?lat=${lat}&lng=${lng}`, {
+        method: 'GET',
+        headers: headers,
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.duplicate && data.location) {
+            showDuplicateWarning(data.location);
+        } else {
+            hideDuplicateWarning();
+        }
+    })
+    .catch(error => {
+        console.warn('Could not check for duplicate locations:', error);
+        hideDuplicateWarning();
+    });
+}
+
+function showDuplicateWarning(location) {
+    const warningDiv = document.getElementById('duplicate_warning');
+    const infoDiv = document.getElementById('existing_location_info');
+    const linkButton = document.getElementById('goto_existing_location');
+    const form = document.getElementById('locationForm');
+    
+    // Update the warning content
+    infoDiv.innerHTML = `
+        <strong>${location.name}</strong><br>
+        <small class="text-muted">
+            ${location.description}<br>
+            Coordinates: ${location.latitude}, ${location.longitude}
+        </small>
+    `;
+    
+    // Update the link to go to existing location
+    linkButton.href = `/location/${location.id}/trees`;
+    
+    // Disable form submission
+    const submitButton = form.querySelector('button[type="submit"]');
+    if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<i class="fas fa-ban"></i> Location Already Exists';
+        submitButton.classList.remove('btn-primary');
+        submitButton.classList.add('btn-danger');
+    }
+    
+    // Show the warning
+    warningDiv.style.display = 'block';
+    
+    // Mark that we have a duplicate
+    window.hasDuplicateLocation = true;
+}
+
+function hideDuplicateWarning() {
+    const warningDiv = document.getElementById('duplicate_warning');
+    const form = document.getElementById('locationForm');
+    
+    // Hide the warning
+    warningDiv.style.display = 'none';
+    
+    // Re-enable form submission
+    const submitButton = form.querySelector('button[type="submit"]');
+    if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.innerHTML = 'Add Location & Plant Tree';
+        submitButton.classList.remove('btn-danger');
+        submitButton.classList.add('btn-primary');
+    }
+    
+    // Clear duplicate flag
+    window.hasDuplicateLocation = false;
+}
+
+
+function validateLocationForm(event) {
+    // Check if we have a duplicate location
+    if (window.hasDuplicateLocation) {
+        event.preventDefault();
+        alert('Cannot create location - this location already exists! Please go to the existing location or select different coordinates.');
+        return false;
+    }
+    return true;
 }
 
 function getCurrentLocation() {
