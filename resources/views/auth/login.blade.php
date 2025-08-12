@@ -58,6 +58,23 @@
             padding: 0 15px;
         }
     }
+    
+    .password-toggle-btn {
+        background: transparent !important;
+        border: none !important;
+        color: #6c757d;
+        padding: 0.375rem 0.5rem;
+    }
+    
+    .password-toggle-btn:hover {
+        color: #495057;
+        background: transparent !important;
+    }
+    
+    .password-toggle-btn:focus {
+        box-shadow: none !important;
+        background: transparent !important;
+    }
 </style>
 
 <div class="login-bg d-flex justify-content-center align-items-center">
@@ -85,7 +102,12 @@
 
                     <div class="mb-3">
                         <label for="password" class="form-label">{{ __('Password') }}</label>
-                        <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="current-password">
+                        <div class="position-relative">
+                            <input id="password" type="password" class="form-control @error('password') is-invalid @enderror pe-5" name="password" required autocomplete="current-password">
+                            <button type="button" class="btn password-toggle-btn position-absolute top-50 end-0 translate-middle-y me-2" id="togglePassword">
+                                <i class="fas fa-eye" id="passwordIcon"></i>
+                            </button>
+                        </div>
 
                         @error('password')
                             <span class="invalid-feedback" role="alert">
@@ -124,5 +146,35 @@
         </div>
     </div>
 </div>
+
+<script>
+// Password visibility toggle functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordField = document.getElementById('password');
+    const passwordIcon = document.getElementById('passwordIcon');
+
+    if (togglePassword && passwordField && passwordIcon) {
+        togglePassword.addEventListener('click', function() {
+            // Toggle the password field type
+            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordField.setAttribute('type', type);
+            
+            // Toggle the icon
+            if (type === 'password') {
+                passwordIcon.classList.remove('fa-eye-slash');
+                passwordIcon.classList.add('fa-eye');
+            } else {
+                passwordIcon.classList.remove('fa-eye');
+                passwordIcon.classList.add('fa-eye-slash');
+            }
+        });
+    }
+});
+</script>
+
+<!-- Include Font Awesome for eye icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
 </body>
 </html>
