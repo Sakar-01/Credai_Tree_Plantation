@@ -44,7 +44,7 @@
                             <div class="position-relative">
                                 <input type="text" class="form-control @error('name') is-invalid @enderror" 
                                        id="name" name="name" value="{{ old('name') }}" required
-                                       placeholder="e.g., Central Park, School Garden" disabled>
+                                       placeholder="e.g., Central Park, School Garden">
                                 <div id="name_update_indicator" class="position-absolute top-50 end-0 translate-middle-y me-2" style="display: none;">
                                     <i class="fas fa-check text-success"></i>
                                 </div>
@@ -90,8 +90,22 @@
 
                         <div class="mb-3">
                             <label for="images" class="form-label">Location Images</label>
-                            <input type="file" class="form-control @error('images.*') is-invalid @enderror" 
+                            <div class="row">
+                                <div class="col-md-6 mb-2">
+                                    <button type="button" class="btn btn-outline-primary w-100" onclick="selectFromGallery()">
+                                        <i class="fas fa-folder-open"></i> Choose from Gallery
+                                    </button>
+                                </div>
+                                <div class="col-md-6 mb-2">
+                                    <button type="button" class="btn btn-outline-success w-100" onclick="captureFromCamera()">
+                                        <i class="fas fa-camera"></i> Take Photo
+                                    </button>
+                                </div>
+                            </div>
+                            <input type="file" class="form-control @error('images.*') is-invalid @enderror d-none" 
                                    id="images" name="images[]" accept="image/*" multiple>
+                            <input type="file" class="d-none" 
+                                   id="camera_input" accept="image/*" capture="environment" capture="camera">
                             <small class="form-text text-muted">Upload multiple images of the location (optional - JPEG, PNG, JPG - Max 5MB each)</small>
                             @error('images.*')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -533,12 +547,45 @@ function getCurrentLocation() {
 // Store selected files globally for manipulation
 let selectedFiles = [];
 
+// Image selection functions
+function selectFromGallery() {
+    document.getElementById('images').click();
+}
+
+function captureFromCamera() {
+    const cameraInput = document.getElementById('camera_input');
+    
+    // Enhanced Android compatibility
+    if (navigator.userAgent.match(/Android/i)) {
+        // For Android, try multiple approaches
+        cameraInput.setAttribute('capture', 'camera');
+        cameraInput.setAttribute('accept', 'image/*;capture=camera');
+        
+        // Some Android browsers respond better to this
+        setTimeout(() => {
+            cameraInput.click();
+        }, 100);
+    } else {
+        // iOS and other browsers
+        cameraInput.click();
+    }
+}
+
 // Image preview functionality
 document.getElementById('images').addEventListener('change', function(e) {
     const files = Array.from(e.target.files);
-    selectedFiles = [...files]; // Store files
-    updateImagePreview();
+    addFilesToSelection(files);
 });
+
+document.getElementById('camera_input').addEventListener('change', function(e) {
+    const files = Array.from(e.target.files);
+    addFilesToSelection(files);
+});
+
+function addFilesToSelection(newFiles) {
+    selectedFiles = [...selectedFiles, ...newFiles];
+    updateImagePreview();
+}
 
 function updateImagePreview() {
     const previewContainer = document.getElementById('preview_container');
