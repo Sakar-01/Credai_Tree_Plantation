@@ -73,9 +73,7 @@
                                 </a>
 
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="{{ route('logout') }}"
-                                       onclick="event.preventDefault();
-                                                     document.getElementById('logout-form').submit();">
+                                    <a class="dropdown-item" href="#" onclick="performLogout(event)">
                                         {{ __('Logout') }}
                                     </a>
 
@@ -94,5 +92,21 @@
             @yield('content')
         </main>
     </div>
+
+<script>
+function performLogout(event) {
+    event.preventDefault();
+    
+    // Try to find and submit the logout form
+    const logoutForm = document.getElementById('logout-form');
+    if (logoutForm) {
+        logoutForm.submit();
+    } else {
+        // Fallback - direct navigation to logout route
+        console.warn('Logout form not found, using fallback method');
+        window.location.href = '{{ route("logout") }}';
+    }
+}
+</script>
 </body>
 </html>
