@@ -141,7 +141,7 @@
                                    id="images" name="images[]" accept="image/*" multiple required>
                             <input type="file" class="d-none" 
                                    id="camera_input" accept="image/*" capture="environment" capture="camera">
-                            <small class="form-text text-muted">Upload multiple images of the planted tree (JPEG, PNG, JPG - Max 5MB each)</small>
+                            <small class="form-text text-muted">Upload multiple images of the planted tree (JPEG, PNG, JPG - Max 100MB each)</small>
                             @error('images.*')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror

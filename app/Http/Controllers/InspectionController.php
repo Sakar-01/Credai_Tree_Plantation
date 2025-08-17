@@ -69,7 +69,7 @@ class InspectionController extends Controller
         $validated = $request->validate([
             'tree_id' => 'required|exists:trees,id',
             'inspection_date' => 'required|date',
-            'photo' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'photo' => 'required|image|mimes:jpeg,png,jpg|max:102400',
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
             'tree_height_cm' => 'nullable|integer|min:1',
@@ -141,7 +141,7 @@ class InspectionController extends Controller
         }
 
         $validated = $request->validate([
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:102400',
             'tree_height_cm' => 'nullable|integer|min:1',
             'tree_health' => 'required|in:good,average,poor',
             'observation_notes' => 'nullable|string',

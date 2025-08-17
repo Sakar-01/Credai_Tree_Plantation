@@ -77,9 +77,9 @@ class TreeController extends Controller
             'longitude' => 'required|numeric|between:-180,180',
             'plantation_date' => 'required|date',
             'next_inspection_date' => 'required|date|after:plantation_date',
-            'photo' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'photo' => 'required|image|mimes:jpeg,png,jpg|max:102400',
             'description' => 'nullable|string',
-            'plantation_survey_file' => 'nullable|file|max:5120',
+            'plantation_survey_file' => 'nullable|file|max:102400',
         ]);
 
         $photoPath = $request->file('photo')->store('tree-photos', 'public');
@@ -161,7 +161,7 @@ class TreeController extends Controller
             'species' => 'required|string|max:255',
             'location_description' => 'required|string|max:255',
             'next_inspection_date' => 'required|date',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:102400',
             'description' => 'nullable|string',
             'status' => 'required|in:planted,under_inspection,healthy,needs_attention,dead',
         ]);
