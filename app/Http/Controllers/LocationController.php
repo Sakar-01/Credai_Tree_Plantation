@@ -240,7 +240,7 @@ class LocationController extends Controller
             ]);
         }
 
-        return redirect()->route('plantations.trees', $plantation)
+        return redirect()->route('plantations.show', $plantation)
             ->with('success', "Plantation drive created successfully in {$location->name}! {$validated['tree_count']} trees have been planted.");
     }
 }
