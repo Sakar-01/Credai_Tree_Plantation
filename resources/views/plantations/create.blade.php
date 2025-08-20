@@ -120,6 +120,21 @@
                             <div class="form-text">How many trees will be planted in this drive? (1-1000)</div>
                         </div>
 
+                        <!-- Next Inspection Date -->
+                        <div class="mb-3">
+                            <label for="next_inspection_date" class="form-label">Next Inspection Date</label>
+                            <input type="date" 
+                                   class="form-control @error('next_inspection_date') is-invalid @enderror" 
+                                   id="next_inspection_date" 
+                                   name="next_inspection_date" 
+                                   value="{{ old('next_inspection_date') }}" 
+                                   min="{{ date('Y-m-d') }}">
+                            @error('next_inspection_date')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            <div class="form-text">When should this plantation drive be inspected next? (optional)</div>
+                        </div>
+
                         <!-- Description -->
                         <div class="mb-3">
                             <label for="description" class="form-label">Description</label>

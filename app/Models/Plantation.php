@@ -16,6 +16,7 @@ class Plantation extends Model
         'latitude',
         'longitude',
         'plantation_date',
+        'next_inspection_date',
         'tree_count',
         'description',
         'images',
@@ -24,6 +25,7 @@ class Plantation extends Model
 
     protected $casts = [
         'plantation_date' => 'date',
+        'next_inspection_date' => 'date',
         'latitude' => 'decimal:8',
         'longitude' => 'decimal:8',
         'images' => 'array',
