@@ -8,12 +8,12 @@
                 <div>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="{{ route('trees.index') }}">Locations</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('trees.index') }}">Trees</a></li>
                             <li class="breadcrumb-item"><a href="{{ route('trees.location', $plantation->location->id) }}">{{ $plantation->location->name }}</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Plantation Drive</li>
+                            <li class="breadcrumb-item active" aria-current="page">Drive #{{ $plantation->id }}</li>
                         </ol>
                     </nav>
-                    <h1><i class="fas fa-seedling"></i> Plantation Drive</h1>
+                    <h1><i class="fas fa-seedling"></i> Drive #{{ $plantation->id }}</h1>
                     <p class="text-muted mb-0">{{ $plantation->location_description }}</p>
                     @if($plantation->landmark)
                         <p class="text-muted"><i class="fas fa-landmark"></i> {{ $plantation->landmark }}</p>
@@ -396,8 +396,8 @@
                                     </p>
                                     <div class="d-flex justify-content-between align-items-center mt-auto">
                                         <div class="btn-group" role="group">
-                                            <a href="{{ route('trees.show', $tree) }}" class="btn btn-sm btn-outline-primary">View</a>
-                                            <a href="{{ route('trees.edit', $tree) }}" class="btn btn-sm btn-primary">Edit</a>
+                                            <a href="{{ route('drives.trees.show', [$plantation, $tree]) }}" class="btn btn-sm btn-outline-primary">View</a>
+                                            <a href="{{ route('drives.trees.edit', [$plantation, $tree]) }}" class="btn btn-sm btn-primary">Edit</a>
                                         </div>
                                         @if($tree->next_inspection_date && $tree->next_inspection_date <= now())
                                             <a href="{{ route('trees.inspect', $tree) }}" class="btn btn-sm btn-warning">Inspect</a>

@@ -220,4 +220,72 @@ class TreeController extends Controller
         return redirect()->route('trees.index')
             ->with('success', 'Tree deleted successfully!');
     }
+
+    public function showDriveTree($plantation_id, Tree $tree)
+    {
+        $plantation = \App\Models\Plantation::findOrFail($plantation_id);
+        
+        if ($tree->plantation_id != $plantation->id) {
+            abort(404, 'Tree not found in this drive.');
+        }
+        
+        if (auth()->user()->isVolunteer() && $tree->planted_by !== auth()->id()) {
+            abort(403, 'You can only view trees you have planted.');
+        }
+
+        $tree->load(['plantedBy', 'inspections.inspectedBy', 'plantation.location']);
+        
+        return view('trees.show', compact('tree', 'plantation'));
+    }
+
+    public function editDriveTree($plantation_id, Tree $tree)
+    {
+        $plantation = \App\Models\Plantation::findOrFail($plantation_id);
+        
+        if ($tree->plantation_id != $plantation->id) {
+            abort(404, 'Tree not found in this drive.');
+        }
+        
+        if (auth()->user()->isVolunteer() && $tree->planted_by !== auth()->id()) {
+            abort(403, 'You can only edit trees you have planted.');
+        }
+
+        $tree->load('plantation.location');
+        
+        return view('trees.edit', compact('tree', 'plantation'));
+    }
+
+    public function updateDriveTree(Request $request, $plantation_id, Tree $tree)
+    {
+        $plantation = \App\Models\Plantation::findOrFail($plantation_id);
+        
+        if ($tree->plantation_id != $plantation->id) {
+            abort(404, 'Tree not found in this drive.');
+        }
+        
+        if (auth()->user()->isVolunteer() && $tree->planted_by !== auth()->id()) {
+            abort(403, 'You can only edit trees you have planted.');
+        }
+
+        $validated = $request->validate([
+            'species' => 'required|string|max:255',
+            'location_description' => 'required|string|max:255',
+            'next_inspection_date' => 'required|date',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:102400',
+            'description' => 'nullable|string',
+            'status' => 'required|in:planted,under_inspection,healthy,needs_attention,dead',
+        ]);
+
+        if ($request->hasFile('photo')) {
+            if ($tree->photo_path) {
+                Storage::disk('public')->delete($tree->photo_path);
+            }
+            $validated['photo_path'] = $request->file('photo')->store('tree-photos', 'public');
+        }
+
+        $tree->update($validated);
+
+        return redirect()->route('drives.trees.show', [$plantation, $tree])
+            ->with('success', 'Tree updated successfully!');
+    }
 }

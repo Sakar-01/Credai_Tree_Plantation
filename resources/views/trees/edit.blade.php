@@ -2,14 +2,38 @@
 
 @section('content')
 <div class="container">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ route('trees.index') }}">Trees</a></li>
+            @if(isset($plantation))
+                <li class="breadcrumb-item"><a href="{{ route('trees.location', $plantation->location->id) }}">{{ $plantation->location->name }}</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('drives.show', $plantation) }}">Drive #{{ $plantation->id }}</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('drives.trees.show', [$plantation, $tree]) }}">{{ $tree->tree_id }}</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Edit</li>
+            @else
+                @if($tree->location)
+                    <li class="breadcrumb-item"><a href="{{ route('trees.location', $tree->location->id) }}">{{ $tree->location->name }}</a></li>
+                @endif
+                <li class="breadcrumb-item"><a href="{{ route('trees.show', $tree) }}">{{ $tree->tree_id }}</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Edit</li>
+            @endif
+        </ol>
+    </nav>
+
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
                 <div class="card-header">
-                    <h4>Edit Tree: {{ $tree->tree_id }}</h4>
+                    <h4>Edit: {{ $tree->tree_id }}</h4>
+                    @if(isset($plantation))
+                        <small class="text-muted">Part of Drive #{{ $plantation->id }}</small>
+                    @else
+                        <small class="text-muted">Individual Tree</small>
+                    @endif
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('trees.update', $tree) }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ isset($plantation) ? route('drives.trees.update', [$plantation, $tree]) : route('trees.update', $tree) }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
                         
@@ -101,7 +125,11 @@
                         </div>
 
                         <div class="d-flex justify-content-between">
-                            <a href="{{ route('trees.show', $tree) }}" class="btn btn-secondary">Cancel</a>
+                            @if(isset($plantation))
+                                <a href="{{ route('drives.trees.show', [$plantation, $tree]) }}" class="btn btn-secondary">Cancel</a>
+                            @else
+                                <a href="{{ route('trees.show', $tree) }}" class="btn btn-secondary">Cancel</a>
+                            @endif
                             <button type="submit" class="btn btn-primary">Update Tree</button>
                         </div>
                     </form>

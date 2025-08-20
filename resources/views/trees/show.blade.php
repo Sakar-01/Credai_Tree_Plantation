@@ -2,14 +2,42 @@
 
 @section('content')
 <div class="container">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ route('trees.index') }}">Trees</a></li>
+            @if(isset($plantation))
+                <li class="breadcrumb-item"><a href="{{ route('trees.location', $plantation->location->id) }}">{{ $plantation->location->name }}</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('drives.show', $plantation) }}">Drive #{{ $plantation->id }}</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ $tree->tree_id }}</li>
+            @else
+                @if($tree->location)
+                    <li class="breadcrumb-item"><a href="{{ route('trees.location', $tree->location->id) }}">{{ $tree->location->name }}</a></li>
+                @endif
+                <li class="breadcrumb-item active" aria-current="page">{{ $tree->tree_id }}</li>
+            @endif
+        </ol>
+    </nav>
+
     <div class="row">
         <div class="col-md-8">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h4>Tree Details: {{ $tree->tree_id }}</h4>
+                    <div>
+                        <h4>{{ $tree->tree_id }}</h4>
+                        @if(isset($plantation))
+                            <small class="text-muted">Part of Drive #{{ $plantation->id }}</small>
+                        @else
+                            <small class="text-muted">Individual Tree</small>
+                        @endif
+                    </div>
                     <div>
                         @if(auth()->user()->isAdmin() || $tree->planted_by === auth()->id())
-                            <a href="{{ route('trees.edit', $tree) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                            @if(isset($plantation))
+                                <a href="{{ route('drives.trees.edit', [$plantation, $tree]) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                            @else
+                                <a href="{{ route('trees.edit', $tree) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                            @endif
                         @endif
                         @if($tree->next_inspection_date && $tree->next_inspection_date <= now())
                             <a href="{{ route('trees.inspect', $tree) }}" class="btn btn-sm btn-warning">Inspect Now</a>
@@ -217,7 +245,11 @@
                         @if($tree->next_inspection_date && $tree->next_inspection_date <= now())
                             <a href="{{ route('trees.inspect', $tree) }}" class="btn btn-warning">Inspect Now</a>
                         @endif
-                        <a href="{{ route('trees.index') }}" class="btn btn-outline-secondary">Back to Trees</a>
+                        @if(isset($plantation))
+                            <a href="{{ route('drives.show', $plantation) }}" class="btn btn-outline-secondary">Back to Drive</a>
+                        @else
+                            <a href="{{ route('trees.index') }}" class="btn btn-outline-secondary">Back to Trees</a>
+                        @endif
                         @if(auth()->user()->isAdmin())
                             <form action="{{ route('trees.destroy', $tree) }}" method="POST" 
                                   onsubmit="return confirm('Are you sure you want to delete this tree?')">

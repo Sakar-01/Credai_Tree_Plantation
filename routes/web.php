@@ -27,6 +27,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/plantation-drives', [PlantationController::class, 'store'])->name('plantations.store');
     Route::get('/plantation-drives/{plantation}', [PlantationController::class, 'trees'])->name('plantations.show');
     
+    // Professional drive URLs
+    Route::get('/drives/{plantation}', [PlantationController::class, 'trees'])->name('drives.show');
+    Route::get('/drives/{plantation}/trees/{tree}', [TreeController::class, 'showDriveTree'])->name('drives.trees.show');
+    Route::get('/drives/{plantation}/trees/{tree}/edit', [TreeController::class, 'editDriveTree'])->name('drives.trees.edit');
+    Route::put('/drives/{plantation}/trees/{tree}', [TreeController::class, 'updateDriveTree'])->name('drives.trees.update');
+    
     // Location routes
     Route::get('/locations/create', [App\Http\Controllers\LocationController::class, 'create'])->name('locations.create');
     Route::post('/locations', [App\Http\Controllers\LocationController::class, 'store'])->name('locations.store');
