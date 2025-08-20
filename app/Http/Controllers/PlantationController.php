@@ -95,7 +95,7 @@ class PlantationController extends Controller
             ]);
         }
 
-        return redirect()->route('plantations.trees', $plantation)
+        return redirect()->route('plantations.show', $plantation)
             ->with('success', "Plantation drive created successfully! {$validated['tree_count']} trees have been planted.");
     }
 
@@ -105,7 +105,7 @@ class PlantationController extends Controller
             abort(403, 'You can only view plantation drives you have created.');
         }
 
-        $plantation->load(['location', 'landmark', 'createdBy']);
+        $plantation->load(['location', 'landmark', 'createdBy', 'inspections.inspectedBy']);
         
         $trees = Tree::with(['latestInspection'])
             ->where('plantation_id', $plantation->id)
@@ -115,14 +115,4 @@ class PlantationController extends Controller
         return view('plantations.trees', compact('plantation', 'trees'));
     }
 
-    public function show(Plantation $plantation)
-    {
-        if (auth()->user()->isVolunteer() && $plantation->created_by !== auth()->id()) {
-            abort(403, 'You can only view plantation drives you have created.');
-        }
-
-        $plantation->load(['location', 'landmark', 'createdBy', 'trees']);
-
-        return view('plantations.show', compact('plantation'));
-    }
 }

@@ -6,6 +6,7 @@ use App\Http\Controllers\InspectionController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\LocationAnalyticsController;
 use App\Http\Controllers\PlantationController;
+use App\Http\Controllers\PlantationInspectionController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -19,12 +20,12 @@ Route::middleware('auth')->group(function () {
     Route::resource('trees', TreeController::class);
     Route::get('/location/{location}/trees', [TreeController::class, 'locationTrees'])->name('trees.location');
     Route::resource('inspections', InspectionController::class);
+    Route::resource('plantation-inspections', PlantationInspectionController::class);
     
     // Plantation Drive routes
     Route::get('/plantation-drives/create', [PlantationController::class, 'create'])->name('plantations.create');
     Route::post('/plantation-drives', [PlantationController::class, 'store'])->name('plantations.store');
-    Route::get('/plantation-drives/{plantation}', [PlantationController::class, 'show'])->name('plantations.show');
-    Route::get('/plantation-drives/{plantation}/trees', [PlantationController::class, 'trees'])->name('plantations.trees');
+    Route::get('/plantation-drives/{plantation}', [PlantationController::class, 'trees'])->name('plantations.show');
     
     // Location routes
     Route::get('/locations/create', [App\Http\Controllers\LocationController::class, 'create'])->name('locations.create');
@@ -40,6 +41,8 @@ Route::middleware('auth')->group(function () {
         ->name('inspections.upcoming.location');
     Route::get('/trees/{tree}/inspect', [InspectionController::class, 'create'])
         ->name('trees.inspect');
+    Route::get('/plantations/{plantation}/inspect', [PlantationInspectionController::class, 'create'])
+        ->name('plantations.inspect');
     
     Route::get('/api/location-suggestions', [LocationAnalyticsController::class, 'getLocationSuggestions']);
     Route::get('/api/locations/check-duplicate', [App\Http\Controllers\LocationController::class, 'checkDuplicate']);

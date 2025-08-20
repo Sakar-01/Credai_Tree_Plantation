@@ -48,4 +48,9 @@ class Plantation extends Model
     {
         return $this->hasMany(Tree::class);
     }
+
+    public function inspections(): HasMany
+    {
+        return $this->hasMany(PlantationInspection::class);
+    }
 }
