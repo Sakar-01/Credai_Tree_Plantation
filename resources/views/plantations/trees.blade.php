@@ -148,129 +148,106 @@
                 </div>
             </div>
 
-            <!-- Drive Inspections Section -->
+            <!-- Drive Inspections and Trees in Columns -->
             <div class="row mb-4">
-                <div class="col-md-12">
-                    <div class="card">
+                <!-- Drive Inspections Column (Left) -->
+                <div class="col-md-5">
+                    <div class="card h-100">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h5><i class="fas fa-clipboard-list"></i> Drive Inspections</h5>
                             <div>
                                 @if($plantation->inspections->count() > 0)
-                                    <span class="badge bg-primary me-2">{{ $plantation->inspections->count() }} inspections</span>
+                                    <span class="badge bg-primary">{{ $plantation->inspections->count() }}</span>
                                 @endif
-                                <a href="{{ route('plantations.inspect', $plantation) }}" class="btn btn-sm btn-warning">
-                                    <i class="fas fa-plus"></i> New Inspection
-                                </a>
                             </div>
                         </div>
                         <div class="card-body">
                             @if($plantation->inspections->count() > 0)
                                 @php
                                     $latestInspection = $plantation->inspections->sortByDesc('inspection_date')->first();
-                                    $recentInspections = $plantation->inspections->sortByDesc('inspection_date')->take(3);
+                                    $recentInspections = $plantation->inspections->sortByDesc('inspection_date')->take(5);
                                 @endphp
 
                                 <!-- Latest Inspection Highlight -->
                                 @if($latestInspection)
                                     <div class="alert alert-info border-start border-primary border-4 mb-3">
-                                        <div class="row align-items-center">
-                                            <div class="col-md-8">
-                                                <h6 class="alert-heading mb-1">
-                                                    <i class="fas fa-clock"></i> Latest Inspection
-                                                    <small class="text-muted">{{ $latestInspection->inspection_date->format('M d, Y') }}</small>
-                                                </h6>
-                                                <div class="row">
-                                                    <div class="col-md-4">
-                                                        <strong>Overall Health:</strong>
-                                                        <span class="badge bg-{{ $latestInspection->overall_health === 'excellent' ? 'success' : ($latestInspection->overall_health === 'good' ? 'primary' : ($latestInspection->overall_health === 'average' ? 'warning' : ($latestInspection->overall_health === 'poor' ? 'danger' : 'dark'))) }}">
-                                                            {{ ucfirst($latestInspection->overall_health) }}
-                                                        </span>
-                                                    </div>
-                                                    <div class="col-md-4">
-                                                        <strong>Trees Checked:</strong> {{ $latestInspection->trees_inspected }}/{{ $plantation->tree_count }}
-                                                    </div>
-                                                    <div class="col-md-4">
-                                                        <strong>Health Ratio:</strong>
-                                                        <span class="text-success">{{ $latestInspection->healthy_trees }}</span> / 
-                                                        <span class="text-danger">{{ $latestInspection->unhealthy_trees }}</span>
-                                                    </div>
-                                                </div>
-                                                @if($latestInspection->next_inspection_date)
-                                                    <small class="text-muted d-block mt-1">
-                                                        <i class="fas fa-calendar-alt"></i> Next inspection due: {{ $latestInspection->next_inspection_date->format('M d, Y') }}
-                                                    </small>
-                                                @endif
+                                        <h6 class="alert-heading mb-1">
+                                            <i class="fas fa-clock"></i> Latest Inspection
+                                        </h6>
+                                        <small class="text-muted">{{ $latestInspection->inspection_date->format('M d, Y') }}</small>
+                                        <div class="mt-2">
+                                            <div class="mb-1">
+                                                <strong>Health:</strong>
+                                                <span class="badge bg-{{ $latestInspection->overall_health === 'excellent' ? 'success' : ($latestInspection->overall_health === 'good' ? 'primary' : ($latestInspection->overall_health === 'average' ? 'warning' : ($latestInspection->overall_health === 'poor' ? 'danger' : 'dark'))) }}">
+                                                    {{ ucfirst($latestInspection->overall_health) }}
+                                                </span>
                                             </div>
-                                            <div class="col-md-4 text-end">
-                                                <a href="{{ route('plantation-inspections.show', $latestInspection) }}" class="btn btn-outline-primary btn-sm">
-                                                    <i class="fas fa-eye"></i> View Details
-                                                </a>
+                                            <div class="mb-1">
+                                                <strong>Trees:</strong> {{ $latestInspection->trees_inspected }}/{{ $plantation->tree_count }}
+                                                (<span class="text-success">{{ $latestInspection->healthy_trees }}</span>H / 
+                                                <span class="text-danger">{{ $latestInspection->unhealthy_trees }}</span>U)
                                             </div>
+                                            @if($latestInspection->next_inspection_date)
+                                                <small class="text-muted">
+                                                    <i class="fas fa-calendar-alt"></i> Next: {{ $latestInspection->next_inspection_date->format('M d, Y') }}
+                                                </small>
+                                            @endif
+                                        </div>
+                                        <div class="mt-2">
+                                            <a href="{{ route('plantation-inspections.show', $latestInspection) }}" class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-eye"></i> View Details
+                                            </a>
                                         </div>
                                     </div>
                                 @endif
 
                                 <!-- Recent Inspections List -->
                                 @if($recentInspections->count() > 1)
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <h6><i class="fas fa-history"></i> Recent Inspections</h6>
-                                            <div class="table-responsive">
-                                                <table class="table table-sm">
-                                                    <thead class="table-light">
-                                                        <tr>
-                                                            <th>Date</th>
-                                                            <th>Health</th>
-                                                            <th>Trees</th>
-                                                            <th>Healthy/Unhealthy</th>
-                                                            <th>Inspector</th>
-                                                            <th>Actions</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        @foreach($recentInspections->skip(1) as $inspection)
-                                                            <tr>
-                                                                <td>{{ $inspection->inspection_date->format('M d, Y') }}</td>
-                                                                <td>
-                                                                    <span class="badge bg-{{ $inspection->overall_health === 'excellent' ? 'success' : ($inspection->overall_health === 'good' ? 'primary' : ($inspection->overall_health === 'average' ? 'warning' : ($inspection->overall_health === 'poor' ? 'danger' : 'dark'))) }} small">
-                                                                        {{ ucfirst($inspection->overall_health) }}
-                                                                    </span>
-                                                                </td>
-                                                                <td>{{ $inspection->trees_inspected }}/{{ $plantation->tree_count }}</td>
-                                                                <td>
-                                                                    <span class="text-success">{{ $inspection->healthy_trees }}</span> / 
-                                                                    <span class="text-danger">{{ $inspection->unhealthy_trees }}</span>
-                                                                </td>
-                                                                <td>{{ $inspection->inspectedBy->name }}</td>
-                                                                <td>
-                                                                    <a href="{{ route('plantation-inspections.show', $inspection) }}" class="btn btn-xs btn-outline-primary">
-                                                                        View
-                                                                    </a>
-                                                                </td>
-                                                            </tr>
-                                                        @endforeach
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                            
-                                            @if($plantation->inspections->count() > 3)
-                                                <div class="text-center mt-2">
-                                                    <a href="{{ route('plantation-inspections.index') }}" class="btn btn-sm btn-outline-secondary">
-                                                        View All {{ $plantation->inspections->count() }} Inspections
+                                    <h6><i class="fas fa-history"></i> Recent Inspections</h6>
+                                    @foreach($recentInspections->skip(1) as $inspection)
+                                        <div class="card mb-2 border-0 bg-light">
+                                            <div class="card-body p-2">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <strong class="small">{{ $inspection->inspection_date->format('M d, Y') }}</strong>
+                                                        <span class="badge bg-{{ $inspection->overall_health === 'excellent' ? 'success' : ($inspection->overall_health === 'good' ? 'primary' : ($inspection->overall_health === 'average' ? 'warning' : ($inspection->overall_health === 'poor' ? 'danger' : 'dark'))) }} small ms-1">
+                                                            {{ ucfirst($inspection->overall_health) }}
+                                                        </span>
+                                                        <br>
+                                                        <small class="text-muted">
+                                                            {{ $inspection->trees_inspected }}/{{ $plantation->tree_count }} trees
+                                                            (<span class="text-success">{{ $inspection->healthy_trees }}</span>H / 
+                                                            <span class="text-danger">{{ $inspection->unhealthy_trees }}</span>U)
+                                                        </small>
+                                                    </div>
+                                                    <a href="{{ route('plantation-inspections.show', $inspection) }}" class="btn btn-xs btn-outline-primary">
+                                                        <i class="fas fa-eye"></i>
                                                     </a>
                                                 </div>
-                                            @endif
+                                            </div>
                                         </div>
-                                    </div>
+                                    @endforeach
                                 @endif
+
+                                <!-- Action Buttons -->
+                                <div class="mt-3">
+                                    <a href="{{ route('plantations.inspect', $plantation) }}" class="btn btn-warning btn-sm w-100 mb-2">
+                                        <i class="fas fa-plus"></i> New Inspection
+                                    </a>
+                                    @if($plantation->inspections->count() > 5)
+                                        <a href="{{ route('plantation-inspections.index') }}" class="btn btn-outline-secondary btn-sm w-100">
+                                            View All {{ $plantation->inspections->count() }} Inspections
+                                        </a>
+                                    @endif
+                                </div>
 
                             @else
                                 <!-- No Inspections Yet -->
-                                <div class="text-center py-4">
-                                    <i class="fas fa-clipboard-check fa-3x text-muted mb-3"></i>
-                                    <h5>No Drive Inspections Yet</h5>
-                                    <p class="text-muted">Start tracking the overall health and progress of this plantation drive.</p>
-                                    <a href="{{ route('plantations.inspect', $plantation) }}" class="btn btn-warning">
+                                <div class="text-center py-3">
+                                    <i class="fas fa-clipboard-check fa-2x text-muted mb-3"></i>
+                                    <h6>No Drive Inspections Yet</h6>
+                                    <p class="text-muted small">Start tracking the overall health and progress of this plantation drive.</p>
+                                    <a href="{{ route('plantations.inspect', $plantation) }}" class="btn btn-warning btn-sm">
                                         <i class="fas fa-clipboard-check"></i> Start First Inspection
                                     </a>
                                 </div>
@@ -278,11 +255,86 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Trees Summary Column (Right) -->
+                <div class="col-md-7">
+                    <div class="card h-100">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5><i class="fas fa-tree"></i> Trees Overview</h5>
+                            <span class="badge bg-success">{{ $plantation->tree_count }} trees</span>
+                        </div>
+                        <div class="card-body">
+                            @php
+                                $statusCounts = $trees->groupBy('status')->map->count();
+                                $speciesCount = $trees->whereNotNull('species')->groupBy('species')->count();
+                                $noSpeciesCount = $trees->whereNull('species')->count();
+                                $recentTrees = $trees->take(6);
+                            @endphp
+
+                            <!-- Quick Stats -->
+                            <div class="row mb-3">
+                                <div class="col-6">
+                                    <div class="text-center p-2 bg-light rounded">
+                                        <h6 class="text-success mb-1">{{ $plantation->tree_count }}</h6>
+                                        <small class="text-muted">Total Trees</small>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="text-center p-2 bg-light rounded">
+                                        <h6 class="text-info mb-1">{{ $speciesCount }}</h6>
+                                        <small class="text-muted">Species Types</small>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <!-- Recent Trees Preview -->
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h6>Recent Trees</h6>
+                                    <small class="text-muted">{{ $trees->count() }} total</small>
+                                </div>
+                                <div class="row">
+                                    @foreach($recentTrees as $tree)
+                                        <div class="col-4 mb-2">
+                                            <div class="card border-0 bg-light">
+                                                <div class="card-body p-2">
+                                                    <div class="text-center">
+                                                        @if($tree->images && count($tree->images) > 0)
+                                                            <img src="{{ asset('storage/' . $tree->images[0]) }}" 
+                                                                 class="img-fluid rounded mb-1" 
+                                                                 style="height: 40px; width: 40px; object-fit: cover;">
+                                                        @else
+                                                            <i class="fas fa-tree fa-2x text-muted mb-1"></i>
+                                                        @endif
+                                                        <br>
+                                                        <small class="fw-bold">{{ $tree->tree_id }}</small>
+                                                        <br>
+                                                        <span class="badge bg-{{ $tree->status === 'healthy' ? 'success' : ($tree->status === 'needs_attention' ? 'danger' : 'secondary') }} small">
+                                                            {{ ucfirst(str_replace('_', ' ', $tree->status)) }}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+
+                            <!-- Action Button -->
+                            <div class="text-center">
+                                <a href="#trees-section" class="btn btn-primary btn-sm" onclick="document.getElementById('trees-section').scrollIntoView({behavior: 'smooth'})">
+                                    <i class="fas fa-tree"></i> View All Trees Below
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Trees Grid -->
             @if($trees->count() > 0)
-                <div class="row">
+                <div id="trees-section" class="row">
                     @foreach($trees as $tree)
                         <div class="col-md-4 mb-4">
                             <div class="card h-100">
