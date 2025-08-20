@@ -14,6 +14,7 @@ class Tree extends Model
         'height',
         'location_id',
         'landmark_id',
+        'plantation_id',
         'location_description',
         'landmark',
         'latitude',
@@ -59,5 +60,10 @@ class Tree extends Model
     public function latestInspection(): HasMany
     {
         return $this->inspections()->latest('inspection_date');
+    }
+
+    public function plantation(): BelongsTo
+    {
+        return $this->belongsTo(Plantation::class);
     }
 }

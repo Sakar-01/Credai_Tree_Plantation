@@ -5,6 +5,7 @@ use App\Http\Controllers\TreeController;
 use App\Http\Controllers\InspectionController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\LocationAnalyticsController;
+use App\Http\Controllers\PlantationController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -19,11 +20,19 @@ Route::middleware('auth')->group(function () {
     Route::get('/location/{location}/trees', [TreeController::class, 'locationTrees'])->name('trees.location');
     Route::resource('inspections', InspectionController::class);
     
+    // Plantation Drive routes
+    Route::get('/plantation-drives/create', [PlantationController::class, 'create'])->name('plantations.create');
+    Route::post('/plantation-drives', [PlantationController::class, 'store'])->name('plantations.store');
+    Route::get('/plantation-drives/{plantation}', [PlantationController::class, 'show'])->name('plantations.show');
+    Route::get('/plantation-drives/{plantation}/trees', [PlantationController::class, 'trees'])->name('plantations.trees');
+    
     // Location routes
     Route::get('/locations/create', [App\Http\Controllers\LocationController::class, 'create'])->name('locations.create');
     Route::post('/locations', [App\Http\Controllers\LocationController::class, 'store'])->name('locations.store');
     Route::get('/locations/{location}/plant-tree', [App\Http\Controllers\LocationController::class, 'plantTreeForm'])->name('locations.plant-tree');
     Route::post('/locations/{location}/plant-tree', [App\Http\Controllers\LocationController::class, 'plantTree'])->name('locations.plant-tree.store');
+    Route::get('/locations/{location}/plantation-drive', [App\Http\Controllers\LocationController::class, 'plantationDriveForm'])->name('locations.plantation-drive');
+    Route::post('/locations/{location}/plantation-drive', [App\Http\Controllers\LocationController::class, 'storePlantationDrive'])->name('locations.plantation-drive.store');
     
     Route::get('/inspections/upcoming/list', [InspectionController::class, 'upcomingInspections'])
         ->name('inspections.upcoming');

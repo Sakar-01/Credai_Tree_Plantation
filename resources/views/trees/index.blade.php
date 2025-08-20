@@ -7,7 +7,7 @@
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h1>Locations</h1>
                 <div>
-                    <a href="{{ route('locations.create') }}" class="btn btn-primary">Add New Location</a>
+                    <a href="{{ route('locations.create') }}" class="btn btn-primary me-2">Add New Location</a>
                     <a href="{{ route('inspections.upcoming') }}" class="btn btn-warning">Upcoming Inspections</a>
                 </div>
             </div>

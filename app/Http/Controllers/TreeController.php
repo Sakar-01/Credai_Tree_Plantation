@@ -29,10 +29,12 @@ class TreeController extends Controller
                 $query->latest();
             }, 'landmarks'])
             ->when(auth()->user()->isVolunteer(), function ($query) {
-                // For volunteers, only show locations where they have trees OR locations with no trees at all
+                // For volunteers, only show locations where they have trees OR plantation drives OR locations with no trees at all
                 $query->where(function ($subQuery) {
                     $subQuery->whereHas('trees', function ($treeQuery) {
                         $treeQuery->where('planted_by', auth()->id());
+                    })->orWhereHas('plantations', function ($plantationQuery) {
+                        $plantationQuery->where('created_by', auth()->id());
                     })->orWhereDoesntHave('trees');
                 });
             })
@@ -51,15 +53,35 @@ class TreeController extends Controller
     {
         $location = Location::with('landmarks')->findOrFail($locationId);
 
-        $trees = Tree::with(['plantedBy', 'latestInspection', 'landmark'])
+        // Get individual trees (not part of plantation drives)
+        $individualTrees = Tree::with(['plantedBy', 'latestInspection', 'landmark'])
+            ->where('location_id', $location->id)
+            ->whereNull('plantation_id')
+            ->when(auth()->user()->isVolunteer(), function ($query) {
+                return $query->where('planted_by', auth()->id());
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(15, ['*'], 'individual_page');
+
+        // Get plantation drives for this location
+        $plantationDrives = \App\Models\Plantation::with(['createdBy', 'trees'])
+            ->where('location_id', $location->id)
+            ->when(auth()->user()->isVolunteer(), function ($query) {
+                return $query->where('created_by', auth()->id());
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(10, ['*'], 'drives_page');
+
+        // Get all trees for this location (for combined view)
+        $allTrees = Tree::with(['plantedBy', 'latestInspection', 'landmark', 'plantation'])
             ->where('location_id', $location->id)
             ->when(auth()->user()->isVolunteer(), function ($query) {
                 return $query->where('planted_by', auth()->id());
             })
             ->orderBy('created_at', 'desc')
-            ->paginate(15);
+            ->paginate(15, ['*'], 'all_page');
 
-        return view('trees.location', compact('trees', 'location'));
+        return view('trees.location', compact('location', 'individualTrees', 'plantationDrives', 'allTrees'));
     }
 
     public function create()

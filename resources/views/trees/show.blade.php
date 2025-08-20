@@ -11,7 +11,7 @@
                         @if(auth()->user()->isAdmin() || $tree->planted_by === auth()->id())
                             <a href="{{ route('trees.edit', $tree) }}" class="btn btn-sm btn-outline-primary">Edit</a>
                         @endif
-                        @if($tree->next_inspection_date <= now())
+                        @if($tree->next_inspection_date && $tree->next_inspection_date <= now())
                             <a href="{{ route('trees.inspect', $tree) }}" class="btn btn-sm btn-warning">Inspect Now</a>
                         @endif
                     </div>
@@ -100,7 +100,13 @@
                                 </tr>
                                 <tr>
                                     <th>Next Inspection:</th>
-                                    <td>{{ $tree->next_inspection_date->format('M d, Y') }}</td>
+                                    <td>
+                                        @if($tree->next_inspection_date)
+                                            {{ $tree->next_inspection_date->format('M d, Y') }}
+                                        @else
+                                            <em class="text-muted">Not scheduled</em>
+                                        @endif
+                                    </td>
                                 </tr>
                                 <tr>
                                     <th>Status:</th>
@@ -208,7 +214,7 @@
                         <button type="button" class="btn btn-outline-primary" onclick="openInGoogleMaps()">
                             <i class="fas fa-external-link-alt"></i> Open in Google Maps
                         </button>
-                        @if($tree->next_inspection_date <= now())
+                        @if($tree->next_inspection_date && $tree->next_inspection_date <= now())
                             <a href="{{ route('trees.inspect', $tree) }}" class="btn btn-warning">Inspect Now</a>
                         @endif
                         <a href="{{ route('trees.index') }}" class="btn btn-outline-secondary">Back to Trees</a>

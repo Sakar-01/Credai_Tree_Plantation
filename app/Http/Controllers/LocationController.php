@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Location;
 use App\Models\Tree;
+use App\Models\Plantation;
+use App\Models\Landmark;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class LocationController extends Controller
 {
@@ -160,5 +163,84 @@ class LocationController extends Controller
         }
         
         return response()->json(['duplicate' => false]);
+    }
+
+    public function plantationDriveForm(Location $location)
+    {
+        if (auth()->user()->isVolunteer()) {
+            // Volunteers can create plantation drives in any location
+        }
+
+        $location->load('landmarks');
+        
+        return view('locations.plantation-drive', compact('location'));
+    }
+
+    public function storePlantationDrive(Request $request, Location $location)
+    {
+        $validated = $request->validate([
+            'landmark' => 'nullable|string|max:255',
+            'latitude' => 'required|numeric|between:-90,90',
+            'longitude' => 'required|numeric|between:-180,180',
+            'plantation_date' => 'required|date',
+            'tree_count' => 'required|integer|min:1|max:1000',
+            'description' => 'nullable|string',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:102400',
+        ]);
+
+        // Handle multiple image uploads
+        $imagePaths = [];
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $imagePaths[] = $image->store('plantation-photos', 'public');
+            }
+        }
+
+        // Create landmark if provided
+        $landmarkId = null;
+        if (!empty($validated['landmark'])) {
+            $landmark = Landmark::firstOrCreate([
+                'name' => $validated['landmark'],
+                'location_id' => $location->id,
+            ], [
+                'description' => 'Landmark in ' . $location->name,
+            ]);
+            $landmarkId = $landmark->id;
+        }
+
+        // Create plantation drive
+        $plantation = Plantation::create([
+            'location_id' => $location->id,
+            'landmark_id' => $landmarkId,
+            'location_description' => $location->description,
+            'landmark' => $validated['landmark'],
+            'latitude' => $validated['latitude'],
+            'longitude' => $validated['longitude'],
+            'plantation_date' => $validated['plantation_date'],
+            'tree_count' => $validated['tree_count'],
+            'description' => $validated['description'],
+            'images' => $imagePaths,
+            'created_by' => auth()->id(),
+        ]);
+
+        // Create multiple trees for this plantation drive
+        for ($i = 1; $i <= $validated['tree_count']; $i++) {
+            Tree::create([
+                'tree_id' => 'TREE-' . strtoupper(Str::random(8)),
+                'plantation_id' => $plantation->id,
+                'location_id' => $location->id,
+                'landmark_id' => $landmarkId,
+                'location_description' => $location->description,
+                'landmark' => $validated['landmark'],
+                'latitude' => $validated['latitude'],
+                'longitude' => $validated['longitude'],
+                'plantation_date' => $validated['plantation_date'],
+                'planted_by' => auth()->id(),
+                'status' => 'planted',
+            ]);
+        }
+
+        return redirect()->route('plantations.trees', $plantation)
+            ->with('success', "Plantation drive created successfully in {$location->name}! {$validated['tree_count']} trees have been planted.");
     }
 }

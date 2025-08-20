@@ -31,6 +31,11 @@ class Location extends Model
         return $this->hasMany(Landmark::class);
     }
 
+    public function plantations(): HasMany
+    {
+        return $this->hasMany(Plantation::class);
+    }
+
     public function getTreeCountAttribute()
     {
         return $this->trees()->count();

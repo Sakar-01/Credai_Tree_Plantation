@@ -139,9 +139,13 @@
                         </div>
                     @endif
                 </form>
-
-                volunteer@treeplantation.org password123 <br/>
-                admin@treeplantation.org password123
+<!-- Add this block for "Product by" -->
+<div class="text-center mt-4">
+    <small class="text-muted">Product by</small><br>
+    <img src="{{ asset('images/whennex.png') }}" alt="Whennex Logo" style="max-height: 40px;">
+</div>
+                {{-- volunteer@treeplantation.org password123 <br/>
+                admin@treeplantation.org password123 --}}
             </div>
         </div>
     </div>

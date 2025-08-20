@@ -23,9 +23,10 @@
                     @endif
                 </div>
                 <div>
-                    <a href="{{ route('locations.plant-tree', $location->id) }}" class="btn btn-primary">Plant New Tree</a>
+                    <a href="{{ route('locations.plant-tree', $location->id) }}" class="btn btn-primary me-2">Plant New Tree</a>
+                    <a href="{{ route('locations.plantation-drive', $location->id) }}" class="btn btn-success me-2">Create Plantation Drive</a>
                     <a href="{{ route('inspections.upcoming.location', $location->id) }}" class="btn btn-warning">
-                        <i class="fas fa-calendar-check"></i> Upcoming Inspections ({{ $location->name }})
+                        <i class="fas fa-calendar-check"></i> Upcoming Inspections
                     </a>
                 </div>
             </div>
@@ -93,7 +94,11 @@
                                                 </tr>
                                                 <tr>
                                                     <th>Total Trees:</th>
-                                                    <td><span class="badge bg-success">{{ $trees->total() }}</span></td>
+                                                    <td><span class="badge bg-success">{{ $allTrees->total() }}</span></td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Plantation Drives:</th>
+                                                    <td><span class="badge bg-info">{{ $plantationDrives->total() }}</span></td>
                                                 </tr>
                                             </table>
                                         </div>
@@ -102,7 +107,7 @@
                                                 <div class="card-body">
                                                     <h6><i class="fas fa-chart-pie"></i> Tree Status Summary</h6>
                                                     @php
-                                                        $statusCounts = $trees->groupBy('status')->map->count();
+                                                        $statusCounts = $allTrees->groupBy('status')->map->count();
                                                     @endphp
                                                     @foreach($statusCounts as $status => $count)
                                                         <div class="d-flex justify-content-between align-items-center mb-1">
@@ -123,83 +128,165 @@
                 </div>
             </div>
 
-            @if($trees->count() > 0)
-                <div class="row">
-                    @foreach($trees as $tree)
-                        <div class="col-md-4 mb-4">
-                            <div class="card">
-                                @if($tree->images && count($tree->images) > 0)
-                                    <div id="treeCarousel{{ $tree->id }}" class="carousel slide" data-bs-ride="carousel">
-                                        <div class="carousel-inner">
-                                            @foreach($tree->images as $index => $image)
-                                                <div class="carousel-item {{ $index == 0 ? 'active' : '' }}">
-                                                    <img src="{{ asset('storage/' . $image) }}" 
-                                                         class="d-block w-100 card-img-top" 
-                                                         style="height: 200px; object-fit: cover;" 
-                                                         alt="Tree Photo {{ $index + 1 }}">
-                                                </div>
-                                            @endforeach
-                                        </div>
-                                        @if(count($tree->images) > 1)
-                                            <button class="carousel-control-prev" type="button" data-bs-target="#treeCarousel{{ $tree->id }}" data-bs-slide="prev">
-                                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                                <span class="visually-hidden">Previous</span>
-                                            </button>
-                                            <button class="carousel-control-next" type="button" data-bs-target="#treeCarousel{{ $tree->id }}" data-bs-slide="next">
-                                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                                <span class="visually-hidden">Next</span>
-                                            </button>
-                                            <div class="position-absolute top-0 end-0 m-2">
-                                                <span class="badge bg-dark bg-opacity-75">{{ count($tree->images) }} photos</span>
-                                            </div>
-                                        @endif
-                                    </div>
-                                @elseif($tree->photo_path)
-                                    <img src="{{ asset('storage/' . $tree->photo_path) }}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="Tree Photo">
-                                @endif
-                                <div class="card-body">
-                                    <h5 class="card-title"><strong> Species: {{ $tree->species }}</strong> </h5>
-                                    <p class="card-text">
-                                        Tree Id - {{ $tree->tree_id }}<br>
-                                        @if($tree->height)
-                                            Height: {{ $tree->height }} cm<br>
-                                        @endif
-                                        @if($tree->landmark_id && is_object($tree->landmark))
-                                            Landmark: {{ $tree->landmark->name }}<br>
-                                        @elseif($tree->landmark)
-                                            Landmark: {{ $tree->landmark }}<br>
-                                        @endif
-                                        Planted: {{ $tree->plantation_date->format('M d, Y') }}<br>
-                                        Status:
-                                        <span class="badge bg-{{ $tree->status === 'healthy' ? 'success' : ($tree->status === 'needs_attention' ? 'danger' : 'secondary') }}">
-                                            {{ ucfirst(str_replace('_', ' ', $tree->status)) }}
-                                        </span>
-                                    </p>
-                                    <div class="d-flex justify-content-between">
-                                        <a href="{{ route('trees.show', $tree) }}" class="btn btn-sm btn-primary">View Details</a>
-                                        @if($tree->next_inspection_date <= now())
-                                            <a href="{{ route('trees.inspect', $tree) }}" class="btn btn-sm btn-warning">Inspect Now</a>
-                                        @endif
-                                    </div>
-                                </div>
-                                <div class="card-footer text-muted">
-                                    Next inspection: {{ $tree->next_inspection_date->format('M d, Y') }}
-                                </div>
+            <!-- Tabs Navigation -->
+            <ul class="nav nav-tabs" id="locationTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="individual-tab" data-bs-toggle="tab" data-bs-target="#individual" type="button" role="tab">
+                        <i class="fas fa-tree"></i> Individual Trees ({{ $individualTrees->total() }})
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="drives-tab" data-bs-toggle="tab" data-bs-target="#drives" type="button" role="tab">
+                        <i class="fas fa-seedling"></i> Plantation Drives ({{ $plantationDrives->total() }})
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab">
+                        <i class="fas fa-list"></i> All Trees ({{ $allTrees->total() }})
+                    </button>
+                </li>
+            </ul>
+
+            <!-- Tabs Content -->
+            <div class="tab-content" id="locationTabsContent">
+                <!-- Individual Trees Tab -->
+                <div class="tab-pane fade show active" id="individual" role="tabpanel">
+                    <div class="py-4">
+                        @if($individualTrees->count() > 0)
+                            <div class="row">
+                                @foreach($individualTrees as $tree)
+                                    @include('trees.partials.tree-card', ['tree' => $tree])
+                                @endforeach
                             </div>
-                        </div>
-                    @endforeach
+                            <div class="d-flex justify-content-center">
+                                {{ $individualTrees->appends(request()->query())->fragment('individual')->links() }}
+                            </div>
+                        @else
+                            <div class="text-center py-5">
+                                <i class="fas fa-tree fa-3x text-muted mb-3"></i>
+                                <h4>No individual trees found</h4>
+                                <p class="text-muted">Plant your first individual tree in this location!</p>
+                                <a href="{{ route('locations.plant-tree', $location->id) }}" class="btn btn-primary">Plant a Tree</a>
+                            </div>
+                        @endif
+                    </div>
                 </div>
 
-                <div class="d-flex justify-content-center">
-                    {{ $trees->links() }}
+                <!-- Plantation Drives Tab -->
+                <div class="tab-pane fade" id="drives" role="tabpanel">
+                    <div class="py-4">
+                        @if($plantationDrives->count() > 0)
+                            <div class="row">
+                                @foreach($plantationDrives as $drive)
+                                    <div class="col-md-6 mb-4">
+                                        <div class="card h-100">
+                                            @if($drive->images && count($drive->images) > 0)
+                                                <div id="driveCarousel{{ $drive->id }}" class="carousel slide" data-bs-ride="carousel">
+                                                    <div class="carousel-inner">
+                                                        @foreach($drive->images as $index => $image)
+                                                            <div class="carousel-item {{ $index == 0 ? 'active' : '' }}">
+                                                                <img src="{{ asset('storage/' . $image) }}" 
+                                                                     class="d-block w-100 card-img-top" 
+                                                                     style="height: 200px; object-fit: cover;" 
+                                                                     alt="Drive Image {{ $index + 1 }}">
+                                                            </div>
+                                                        @endforeach
+                                                    </div>
+                                                    @if(count($drive->images) > 1)
+                                                        <button class="carousel-control-prev" type="button" data-bs-target="#driveCarousel{{ $drive->id }}" data-bs-slide="prev">
+                                                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                                            <span class="visually-hidden">Previous</span>
+                                                        </button>
+                                                        <button class="carousel-control-next" type="button" data-bs-target="#driveCarousel{{ $drive->id }}" data-bs-slide="next">
+                                                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                                            <span class="visually-hidden">Next</span>
+                                                        </button>
+                                                        <div class="position-absolute top-0 end-0 m-2">
+                                                            <span class="badge bg-dark bg-opacity-75">{{ count($drive->images) }} photos</span>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                            @else
+                                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                                    <i class="fas fa-seedling fa-3x text-muted"></i>
+                                                </div>
+                                            @endif
+                                            <div class="card-body">
+                                                <h5 class="card-title">
+                                                    <i class="fas fa-calendar"></i> {{ $drive->plantation_date->format('M d, Y') }}
+                                                </h5>
+                                                <p class="card-text">
+                                                    <strong>Trees Planted:</strong> <span class="badge bg-success">{{ $drive->tree_count }}</span><br>
+                                                    <strong>Created by:</strong> {{ $drive->createdBy->name }}<br>
+                                                    @if($drive->landmark)
+                                                        <strong>Landmark:</strong> {{ $drive->landmark }}<br>
+                                                    @endif
+                                                    @if($drive->description)
+                                                        <strong>Description:</strong> {{ Str::limit($drive->description, 60) }}
+                                                    @endif
+                                                </p>
+                                                @php
+                                                    $driveTreesWithSpecies = $drive->trees->whereNotNull('species')->count();
+                                                    $driveTreesNeedingSpecies = $drive->trees->whereNull('species')->count();
+                                                @endphp
+                                                <div class="mb-3">
+                                                    @if($driveTreesWithSpecies > 0)
+                                                        <span class="badge bg-info me-1">{{ $driveTreesWithSpecies }} with species</span>
+                                                    @endif
+                                                    @if($driveTreesNeedingSpecies > 0)
+                                                        <span class="badge bg-warning">{{ $driveTreesNeedingSpecies }} need species</span>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                            <div class="card-footer">
+                                                <a href="{{ route('plantations.trees', $drive) }}" class="btn btn-primary btn-sm">
+                                                    <i class="fas fa-eye"></i> View Trees
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                            <div class="d-flex justify-content-center">
+                                {{ $plantationDrives->appends(request()->query())->fragment('drives')->links() }}
+                            </div>
+                        @else
+                            <div class="text-center py-5">
+                                <i class="fas fa-seedling fa-3x text-muted mb-3"></i>
+                                <h4>No plantation drives found</h4>
+                                <p class="text-muted">Create your first plantation drive in this location!</p>
+                                <a href="{{ route('plantations.create') }}?location_id={{ $location->id }}" class="btn btn-success">Create Plantation Drive</a>
+                            </div>
+                        @endif
+                    </div>
                 </div>
-            @else
-                <div class="text-center">
-                    <h3>No trees found in this location</h3>
-                    <p class="text-muted">Be the first to plant a tree here!</p>
-                    <a href="{{ route('locations.plant-tree', $location->id) }}" class="btn btn-primary btn-lg">Plant a Tree</a>
+
+                <!-- All Trees Tab -->
+                <div class="tab-pane fade" id="all" role="tabpanel">
+                    <div class="py-4">
+                        @if($allTrees->count() > 0)
+                            <div class="row">
+                                @foreach($allTrees as $tree)
+                                    @include('trees.partials.tree-card', ['tree' => $tree, 'showPlantationInfo' => true])
+                                @endforeach
+                            </div>
+                            <div class="d-flex justify-content-center">
+                                {{ $allTrees->appends(request()->query())->fragment('all')->links() }}
+                            </div>
+                        @else
+                            <div class="text-center py-5">
+                                <i class="fas fa-tree fa-3x text-muted mb-3"></i>
+                                <h4>No trees found in this location</h4>
+                                <p class="text-muted">Be the first to plant trees here!</p>
+                                <div>
+                                    <a href="{{ route('locations.plant-tree', $location->id) }}" class="btn btn-primary me-2">Plant a Tree</a>
+                                    <a href="{{ route('plantations.create') }}?location_id={{ $location->id }}" class="btn btn-success">Create Plantation Drive</a>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
                 </div>
-            @endif
+            </div>
         </div>
     </div>
 </div>

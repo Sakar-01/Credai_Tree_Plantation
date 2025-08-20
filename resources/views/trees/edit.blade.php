@@ -52,7 +52,7 @@
                             <label for="next_inspection_date" class="form-label">Next Inspection Date *</label>
                             <input type="date" class="form-control @error('next_inspection_date') is-invalid @enderror" 
                                    id="next_inspection_date" name="next_inspection_date" 
-                                   value="{{ old('next_inspection_date', $tree->next_inspection_date->format('Y-m-d')) }}" required>
+                                   value="{{ old('next_inspection_date', $tree->next_inspection_date ? $tree->next_inspection_date->format('Y-m-d') : '') }}" required>
                             @error('next_inspection_date')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
