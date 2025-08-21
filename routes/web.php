@@ -25,10 +25,10 @@ Route::middleware('auth')->group(function () {
     // Plantation Drive routes
     Route::get('/plantation-drives/create', [PlantationController::class, 'create'])->name('plantations.create');
     Route::post('/plantation-drives', [PlantationController::class, 'store'])->name('plantations.store');
-    Route::get('/plantation-drives/{plantation}', [PlantationController::class, 'trees'])->name('plantations.show');
+    Route::get('/plantation-drives/{plantation}', [PlantationController::class, 'show'])->name('plantations.show');
     
     // Professional drive URLs
-    Route::get('/drives/{plantation}', [PlantationController::class, 'trees'])->name('drives.show');
+    Route::get('/drives/{plantation}', [PlantationController::class, 'show'])->name('drives.show');
     Route::get('/drives/{plantation}/trees/{tree}', [TreeController::class, 'showDriveTree'])->name('drives.trees.show');
     Route::get('/drives/{plantation}/trees/{tree}/edit', [TreeController::class, 'editDriveTree'])->name('drives.trees.edit');
     Route::put('/drives/{plantation}/trees/{tree}', [TreeController::class, 'updateDriveTree'])->name('drives.trees.update');

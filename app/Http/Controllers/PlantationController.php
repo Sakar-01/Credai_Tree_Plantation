@@ -80,28 +80,12 @@ class PlantationController extends Controller
             'created_by' => auth()->id(),
         ]);
 
-        // Create multiple trees for this plantation drive
-        for ($i = 1; $i <= $validated['tree_count']; $i++) {
-            Tree::create([
-                'tree_id' => 'TREE-' . strtoupper(Str::random(8)),
-                'plantation_id' => $plantation->id,
-                'location_id' => $location->id,
-                'landmark_id' => $landmarkId,
-                'location_description' => $validated['location_description'],
-                'landmark' => $validated['landmark'],
-                'latitude' => $validated['latitude'],
-                'longitude' => $validated['longitude'],
-                'plantation_date' => $validated['plantation_date'],
-                'planted_by' => auth()->id(),
-                'status' => 'planted',
-            ]);
-        }
 
         return redirect()->route('plantations.show', $plantation)
-            ->with('success', "Plantation drive created successfully! {$validated['tree_count']} trees have been planted.");
+            ->with('success', "Plantation drive created successfully for {$validated['tree_count']} trees!");
     }
 
-    public function trees(Plantation $plantation)
+    public function show(Plantation $plantation)
     {
         if (auth()->user()->isVolunteer() && $plantation->created_by !== auth()->id()) {
             abort(403, 'You can only view plantation drives you have created.');
@@ -109,12 +93,7 @@ class PlantationController extends Controller
 
         $plantation->load(['location', 'landmark', 'createdBy', 'inspections.inspectedBy']);
         
-        $trees = Tree::with(['latestInspection'])
-            ->where('plantation_id', $plantation->id)
-            ->orderBy('created_at', 'desc')
-            ->paginate(15);
-
-        return view('plantations.trees', compact('plantation', 'trees'));
+        return view('plantations.show', compact('plantation'));
     }
 
 }

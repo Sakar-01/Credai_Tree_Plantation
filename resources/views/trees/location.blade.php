@@ -240,7 +240,7 @@
                                             </div>
                                             <div class="card-footer">
                                                 <a href="{{ route('plantations.show', $drive) }}" class="btn btn-primary btn-sm">
-                                                    <i class="fas fa-eye"></i> View Trees
+                                                    <i class="fas fa-eye"></i> View Details
                                                 </a>
                                             </div>
                                         </div>
