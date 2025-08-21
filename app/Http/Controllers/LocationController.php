@@ -84,6 +84,19 @@ class LocationController extends Controller
             'description' => 'nullable|string',
             'images.*' => 'required|image|mimes:jpeg,png,jpg|max:102400',
         ]);
+        
+        // Validate that the coordinates are within 500m of the location center
+        $distance = $this->calculateDistance(
+            $location->latitude, $location->longitude,
+            $validated['latitude'], $validated['longitude']
+        );
+        
+        if ($distance > 500) { // 500 meters
+            return back()->withErrors([
+                'latitude' => 'The selected location must be within 500 meters of the designated area.',
+                'longitude' => 'The selected location must be within 500 meters of the designated area.'
+            ])->withInput();
+        }
 
         // Handle multiple image uploads for tree
         $imagePaths = [];
@@ -187,6 +200,19 @@ class LocationController extends Controller
             'description' => 'nullable|string',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:102400',
         ]);
+        
+        // Validate that the coordinates are within 500m of the location center
+        $distance = $this->calculateDistance(
+            $location->latitude, $location->longitude,
+            $validated['latitude'], $validated['longitude']
+        );
+        
+        if ($distance > 500) { // 500 meters
+            return back()->withErrors([
+                'latitude' => 'The selected location must be within 500 meters of the designated area.',
+                'longitude' => 'The selected location must be within 500 meters of the designated area.'
+            ])->withInput();
+        }
 
         // Handle multiple image uploads
         $imagePaths = [];
@@ -242,5 +268,23 @@ class LocationController extends Controller
 
         return redirect()->route('plantations.show', $plantation)
             ->with('success', "Plantation drive created successfully in {$location->name}! {$validated['tree_count']} trees have been planted.");
+    }
+    
+    /**
+     * Calculate distance between two coordinates in meters using Haversine formula
+     */
+    private function calculateDistance($lat1, $lng1, $lat2, $lng2)
+    {
+        $earthRadius = 6371000; // Earth's radius in meters
+        
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLng = deg2rad($lng2 - $lng1);
+        
+        $a = sin($dLat/2) * sin($dLat/2) +
+             cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
+             sin($dLng/2) * sin($dLng/2);
+        $c = 2 * atan2(sqrt($a), sqrt(1-$a));
+        
+        return $earthRadius * $c;
     }
 }

@@ -131,13 +131,13 @@
                         </button>
                     </div>
 
-                    @if (Route::has('password.request'))
+                    {{-- @if (Route::has('password.request'))
                         <div class="text-center">
                             <a class="btn btn-link" href="{{ route('password.request') }}">
                                 {{ __('Forgot Your Password?') }}
                             </a>
                         </div>
-                    @endif
+                    @endif --}}
                 </form>
 <!-- Add this block for "Product by" -->
 <div class="text-center mt-4">

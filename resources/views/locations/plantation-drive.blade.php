@@ -70,7 +70,7 @@
                                     @enderror
                                 </div>
                             </div>
-                            <small class="form-text text-muted">Click on the map to select the exact plantation area within this location</small>
+                            <small class="form-text text-muted">Click on the map to select the exact plantation area (within 500m radius shown in green circle).</small>
                         </div>
 
                         <div class="mb-3">
@@ -186,7 +186,7 @@ window.initGoogleMapsPlantationLocation = function() {
 };
 </script>
 
-<script async defer src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&callback=initGoogleMapsPlantationLocation"></script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&libraries=geometry&callback=initGoogleMapsPlantationLocation"></script>
 
 <script>
 let map;
@@ -197,21 +197,25 @@ window.initMapPlantationLocation = function initMapPlantationLocation() {
     const locationCenter = { lat: {{ $location->latitude }}, lng: {{ $location->longitude }} };
     
     map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 18,
+        zoom: 14, // Adjusted zoom to better show 2km radius
         center: locationCenter,
     });
 
-    // Show location boundary circle
+    // Show location boundary circle (2km radius)
     const locationCircle = new google.maps.Circle({
         strokeColor: '#28a745',
-        strokeOpacity: 0.8,
-        strokeWeight: 2,
+        strokeOpacity: 1.0,
+        strokeWeight: 3,
         fillColor: '#28a745',
-        fillOpacity: 0.1,
+        fillOpacity: 0.15,
         map: map,
         center: locationCenter,
-        radius: 50 // 50 meter radius
+        radius: 500 // 500m radius
     });
+    
+    
+    // Store the circle for distance validation
+    window.locationCircle = locationCircle;
 
     // Initialize marker at current coordinates
     const currentCoords = {
@@ -231,14 +235,25 @@ window.initMapPlantationLocation = function initMapPlantationLocation() {
         }
     });
 
-    // Add click listener to map
+    // Add click listener to map with radius validation
     map.addListener('click', function(e) {
-        placeMarker(e.latLng);
+        if (isWithinRadius(e.latLng, locationCenter, 500)) {
+            placeMarker(e.latLng);
+        } else {
+            alert('Please select a location within 500 meters of the designated area.');
+        }
     });
 
-    // Add drag listener to marker
+    // Add drag listener to marker with radius validation
     marker.addListener('dragend', function() {
-        updateCoordinates(marker.getPosition().lat(), marker.getPosition().lng());
+        const position = marker.getPosition();
+        if (isWithinRadius(position, locationCenter, 500)) {
+            updateCoordinates(position.lat(), position.lng());
+        } else {
+            // Reset marker to previous valid position
+            marker.setPosition(locationCircle.getCenter());
+            alert('Please select a location within 500 meters of the designated area.');
+        }
     });
 }
 
@@ -250,6 +265,26 @@ function placeMarker(location) {
 function updateCoordinates(lat, lng) {
     document.getElementById('latitude').value = lat.toFixed(8);
     document.getElementById('longitude').value = lng.toFixed(8);
+}
+
+// Function to check if a point is within the allowed radius
+function isWithinRadius(point, center, radiusMeters) {
+    const distance = google.maps.geometry.spherical.computeDistanceBetween(point, center);
+    console.log('Distance from center:', Math.round(distance), 'meters (', Math.round(distance/1000 * 100)/100, 'km)');
+    console.log('Allowed radius:', radiusMeters, 'meters (', radiusMeters/1000, 'km)');
+    return distance <= radiusMeters;
+}
+
+// Function to calculate distance between two coordinates
+function calculateDistance(lat1, lng1, lat2, lng2) {
+    const R = 6371000; // Earth's radius in meters
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLng/2) * Math.sin(dLng/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
 }
 
 function getCurrentLocation() {
@@ -266,9 +301,16 @@ function getCurrentLocation() {
                 const lng = position.coords.longitude;
                 const location = new google.maps.LatLng(lat, lng);
                 
-                map.setCenter(location);
-                map.setZoom(18);
-                placeMarker(location);
+                // Check if current location is within radius
+                const locationCenter = { lat: {{ $location->latitude }}, lng: {{ $location->longitude }} };
+                if (isWithinRadius(location, locationCenter, 500)) {
+                    map.setCenter(location);
+                    map.setZoom(16);
+                    placeMarker(location);
+                } else {
+                    alert('Your current location is outside the 500 meter allowed radius for this area.');
+                    return;
+                }
                 
                 button.innerHTML = '<i class="fas fa-check"></i> Location detected!';
                 setTimeout(() => {
