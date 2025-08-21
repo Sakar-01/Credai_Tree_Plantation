@@ -17,27 +17,10 @@ class TreeController extends Controller
 
     public function index()
     {
-        $locations = Location::withCount(['trees' => function ($query) {
-                if (auth()->user()->isVolunteer()) {
-                    $query->where('planted_by', auth()->id());
-                }
-            }])
+        $locations = Location::withCount('trees')
             ->with(['trees' => function ($query) {
-                if (auth()->user()->isVolunteer()) {
-                    $query->where('planted_by', auth()->id());
-                }
                 $query->latest();
             }, 'landmarks'])
-            ->when(auth()->user()->isVolunteer(), function ($query) {
-                // For volunteers, only show locations where they have trees OR plantation drives OR locations with no trees at all
-                $query->where(function ($subQuery) {
-                    $subQuery->whereHas('trees', function ($treeQuery) {
-                        $treeQuery->where('planted_by', auth()->id());
-                    })->orWhereHas('plantations', function ($plantationQuery) {
-                        $plantationQuery->where('created_by', auth()->id());
-                    })->orWhereDoesntHave('trees');
-                });
-            })
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -57,27 +40,18 @@ class TreeController extends Controller
         $individualTrees = Tree::with(['plantedBy', 'latestInspection', 'landmark'])
             ->where('location_id', $location->id)
             ->whereNull('plantation_id')
-            ->when(auth()->user()->isVolunteer(), function ($query) {
-                return $query->where('planted_by', auth()->id());
-            })
             ->orderBy('created_at', 'desc')
             ->paginate(15, ['*'], 'individual_page');
 
         // Get plantation drives for this location
         $plantationDrives = \App\Models\Plantation::with(['createdBy', 'trees'])
             ->where('location_id', $location->id)
-            ->when(auth()->user()->isVolunteer(), function ($query) {
-                return $query->where('created_by', auth()->id());
-            })
             ->orderBy('created_at', 'desc')
             ->paginate(10, ['*'], 'drives_page');
 
         // Get all trees for this location (for combined view)
         $allTrees = Tree::with(['plantedBy', 'latestInspection', 'landmark', 'plantation'])
             ->where('location_id', $location->id)
-            ->when(auth()->user()->isVolunteer(), function ($query) {
-                return $query->where('planted_by', auth()->id());
-            })
             ->orderBy('created_at', 'desc')
             ->paginate(15, ['*'], 'all_page');
 
@@ -157,27 +131,16 @@ class TreeController extends Controller
     {
         $tree->load(['plantedBy', 'inspections.inspectedBy']);
         
-        if (auth()->user()->isVolunteer() && $tree->planted_by !== auth()->id()) {
-            abort(403, 'You can only view trees you have planted.');
-        }
-
         return view('trees.show', compact('tree'));
     }
 
     public function edit(Tree $tree)
     {
-        if (auth()->user()->isVolunteer() && $tree->planted_by !== auth()->id()) {
-            abort(403, 'You can only edit trees you have planted.');
-        }
-
         return view('trees.edit', compact('tree'));
     }
 
     public function update(Request $request, Tree $tree)
     {
-        if (auth()->user()->isVolunteer() && $tree->planted_by !== auth()->id()) {
-            abort(403, 'You can only edit trees you have planted.');
-        }
 
         $validated = $request->validate([
             'species' => 'required|string|max:255',
@@ -229,10 +192,6 @@ class TreeController extends Controller
             abort(404, 'Tree not found in this drive.');
         }
         
-        if (auth()->user()->isVolunteer() && $tree->planted_by !== auth()->id()) {
-            abort(403, 'You can only view trees you have planted.');
-        }
-
         $tree->load(['plantedBy', 'inspections.inspectedBy', 'plantation.location']);
         
         return view('trees.show', compact('tree', 'plantation'));
@@ -246,10 +205,6 @@ class TreeController extends Controller
             abort(404, 'Tree not found in this drive.');
         }
         
-        if (auth()->user()->isVolunteer() && $tree->planted_by !== auth()->id()) {
-            abort(403, 'You can only edit trees you have planted.');
-        }
-
         $tree->load('plantation.location');
         
         return view('trees.edit', compact('tree', 'plantation'));
@@ -261,10 +216,6 @@ class TreeController extends Controller
         
         if ($tree->plantation_id != $plantation->id) {
             abort(404, 'Tree not found in this drive.');
-        }
-        
-        if (auth()->user()->isVolunteer() && $tree->planted_by !== auth()->id()) {
-            abort(403, 'You can only edit trees you have planted.');
         }
 
         $validated = $request->validate([

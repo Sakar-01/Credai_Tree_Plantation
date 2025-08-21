@@ -87,10 +87,6 @@ class PlantationController extends Controller
 
     public function show(Plantation $plantation)
     {
-        if (auth()->user()->isVolunteer() && $plantation->created_by !== auth()->id()) {
-            abort(403, 'You can only view plantation drives you have created.');
-        }
-
         $plantation->load(['location', 'landmark', 'createdBy', 'inspections.inspectedBy']);
         
         return view('plantations.show', compact('plantation'));

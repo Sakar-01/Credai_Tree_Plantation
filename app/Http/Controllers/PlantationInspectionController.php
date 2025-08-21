@@ -17,9 +17,6 @@ class PlantationInspectionController extends Controller
     public function index()
     {
         $inspections = PlantationInspection::with(['plantation', 'inspectedBy'])
-            ->when(auth()->user()->isVolunteer(), function ($query) {
-                return $query->where('inspected_by', auth()->id());
-            })
             ->orderBy('inspection_date', 'desc')
             ->paginate(15);
 
@@ -28,10 +25,6 @@ class PlantationInspectionController extends Controller
 
     public function create(Plantation $plantation)
     {
-        if (auth()->user()->isVolunteer() && $plantation->created_by !== auth()->id()) {
-            abort(403, 'You can only inspect plantation drives you have created.');
-        }
-
         return view('plantation-inspections.create', compact('plantation'));
     }
 
@@ -52,10 +45,6 @@ class PlantationInspectionController extends Controller
         ]);
 
         $plantation = Plantation::findOrFail($validated['plantation_id']);
-        
-        if (auth()->user()->isVolunteer() && $plantation->created_by !== auth()->id()) {
-            abort(403, 'You can only inspect plantation drives you have created.');
-        }
 
         $imagePaths = [];
         if ($request->hasFile('images')) {
@@ -86,27 +75,16 @@ class PlantationInspectionController extends Controller
     {
         $plantationInspection->load(['plantation', 'inspectedBy']);
         
-        if (auth()->user()->isVolunteer() && $plantationInspection->inspected_by !== auth()->id()) {
-            abort(403, 'You can only view inspections you have conducted.');
-        }
-
         return view('plantation-inspections.show', compact('plantationInspection'));
     }
 
     public function edit(PlantationInspection $plantationInspection)
     {
-        if (auth()->user()->isVolunteer() && $plantationInspection->inspected_by !== auth()->id()) {
-            abort(403, 'You can only edit inspections you have conducted.');
-        }
-
         return view('plantation-inspections.edit', compact('plantationInspection'));
     }
 
     public function update(Request $request, PlantationInspection $plantationInspection)
     {
-        if (auth()->user()->isVolunteer() && $plantationInspection->inspected_by !== auth()->id()) {
-            abort(403, 'You can only edit inspections you have conducted.');
-        }
 
         $validated = $request->validate([
             'description' => 'required|string|max:1000',

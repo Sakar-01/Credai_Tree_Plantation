@@ -17,9 +17,6 @@ class InspectionController extends Controller
     public function index()
     {
         $inspections = Inspection::with(['tree', 'inspectedBy'])
-            ->when(auth()->user()->isVolunteer(), function ($query) {
-                return $query->where('inspected_by', auth()->id());
-            })
             ->orderBy('inspection_date', 'desc')
             ->paginate(15);
 
@@ -29,9 +26,6 @@ class InspectionController extends Controller
     public function upcomingInspections()
     {
         $upcomingTrees = Tree::where('next_inspection_date', '<=', now()->addDays(7))
-            ->when(auth()->user()->isVolunteer(), function ($query) {
-                return $query->where('planted_by', auth()->id());
-            })
             ->with(['plantedBy', 'latestInspection'])
             ->orderBy('next_inspection_date', 'asc')
             ->get();
@@ -45,9 +39,6 @@ class InspectionController extends Controller
         
         $upcomingTrees = Tree::where('location_id', $locationId)
             ->where('next_inspection_date', '<=', now()->addDays(7))
-            ->when(auth()->user()->isVolunteer(), function ($query) {
-                return $query->where('planted_by', auth()->id());
-            })
             ->with(['plantedBy', 'latestInspection'])
             ->orderBy('next_inspection_date', 'asc')
             ->get();
@@ -57,10 +48,6 @@ class InspectionController extends Controller
 
     public function create(Tree $tree)
     {
-        if (auth()->user()->isVolunteer() && $tree->planted_by !== auth()->id()) {
-            abort(403, 'You can only inspect trees you have planted.');
-        }
-
         return view('inspections.create', compact('tree'));
     }
 
@@ -79,10 +66,6 @@ class InspectionController extends Controller
         ]);
 
         $tree = Tree::findOrFail($validated['tree_id']);
-        
-        if (auth()->user()->isVolunteer() && $tree->planted_by !== auth()->id()) {
-            abort(403, 'You can only inspect trees you have planted.');
-        }
 
         $photoPath = $request->file('photo')->store('inspection-photos', 'public');
 
@@ -118,27 +101,16 @@ class InspectionController extends Controller
     {
         $inspection->load(['tree', 'inspectedBy']);
         
-        if (auth()->user()->isVolunteer() && $inspection->inspected_by !== auth()->id()) {
-            abort(403, 'You can only view inspections you have conducted.');
-        }
-
         return view('inspections.show', compact('inspection'));
     }
 
     public function edit(Inspection $inspection)
     {
-        if (auth()->user()->isVolunteer() && $inspection->inspected_by !== auth()->id()) {
-            abort(403, 'You can only edit inspections you have conducted.');
-        }
-
         return view('inspections.edit', compact('inspection'));
     }
 
     public function update(Request $request, Inspection $inspection)
     {
-        if (auth()->user()->isVolunteer() && $inspection->inspected_by !== auth()->id()) {
-            abort(403, 'You can only edit inspections you have conducted.');
-        }
 
         $validated = $request->validate([
             'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:102400',
