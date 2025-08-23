@@ -29,7 +29,7 @@ class PlantationController extends Controller
             'latitude' => 'required|numeric|between:-90,90',
             'longitude' => 'required|numeric|between:-180,180',
             'plantation_date' => 'required|date',
-            'next_inspection_date' => 'nullable|date|after_or_equal:today',
+            'next_inspection_date' => 'required|date|after_or_equal:today',
             'tree_count' => 'required|integer|min:1|max:1000',
             'description' => 'nullable|string',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:102400',

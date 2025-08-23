@@ -89,18 +89,33 @@
                             </small>
                         </div>
 
-                        <!-- Plantation Date -->
-                        <div class="mb-3">
-                            <label for="plantation_date" class="form-label">Plantation Date <span class="text-danger">*</span></label>
-                            <input type="date" 
-                                   class="form-control @error('plantation_date') is-invalid @enderror" 
-                                   id="plantation_date" 
-                                   name="plantation_date" 
-                                   value="{{ old('plantation_date', date('Y-m-d')) }}" 
-                                   required>
-                            @error('plantation_date')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                        <!-- Plantation Date and Next Inspection Date -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="plantation_date" class="form-label">Plantation Date <span class="text-danger">*</span></label>
+                                <input type="date" 
+                                       class="form-control @error('plantation_date') is-invalid @enderror" 
+                                       id="plantation_date" 
+                                       name="plantation_date" 
+                                       value="{{ old('plantation_date', date('Y-m-d')) }}" 
+                                       required>
+                                @error('plantation_date')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-md-6">
+                                <label for="next_inspection_date" class="form-label">Next Inspection Date <span class="text-danger">*</span></label>
+                                <input type="date" 
+                                       class="form-control @error('next_inspection_date') is-invalid @enderror" 
+                                       id="next_inspection_date" 
+                                       name="next_inspection_date" 
+                                       value="{{ old('next_inspection_date') }}" 
+                                       min="{{ date('Y-m-d') }}"
+                                       required>
+                                @error('next_inspection_date')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
                         </div>
 
                         <!-- Number of Trees -->
@@ -118,21 +133,6 @@
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                             <div class="form-text">How many trees will be planted in this drive? (1-1000)</div>
-                        </div>
-
-                        <!-- Next Inspection Date -->
-                        <div class="mb-3">
-                            <label for="next_inspection_date" class="form-label">Next Inspection Date</label>
-                            <input type="date" 
-                                   class="form-control @error('next_inspection_date') is-invalid @enderror" 
-                                   id="next_inspection_date" 
-                                   name="next_inspection_date" 
-                                   value="{{ old('next_inspection_date') }}" 
-                                   min="{{ date('Y-m-d') }}">
-                            @error('next_inspection_date')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                            <div class="form-text">When should this plantation drive be inspected next? (optional)</div>
                         </div>
 
                         <!-- Description -->
