@@ -24,7 +24,7 @@
                         
        
                         <div class="mb-3">
-                            <label for="description" class="form-label">Location Description *</label>
+                            <label for="description" class="form-label">Location *</label>
                             <div class="position-relative">
                                 <input type="text" class="form-control @error('description') is-invalid @enderror" 
                                        id="description" name="description" value="{{ old('description') }}" 

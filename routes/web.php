@@ -36,6 +36,8 @@ Route::middleware('auth')->group(function () {
     // Location routes
     Route::get('/locations/create', [App\Http\Controllers\LocationController::class, 'create'])->name('locations.create');
     Route::post('/locations', [App\Http\Controllers\LocationController::class, 'store'])->name('locations.store');
+    Route::get('/locations/{location}/edit', [App\Http\Controllers\LocationController::class, 'edit'])->name('locations.edit');
+    Route::put('/locations/{location}', [App\Http\Controllers\LocationController::class, 'update'])->name('locations.update');
     Route::get('/locations/{location}/plant-tree', [App\Http\Controllers\LocationController::class, 'plantTreeForm'])->name('locations.plant-tree');
     Route::post('/locations/{location}/plant-tree', [App\Http\Controllers\LocationController::class, 'plantTree'])->name('locations.plant-tree.store');
     Route::get('/locations/{location}/plantation-drive', [App\Http\Controllers\LocationController::class, 'plantationDriveForm'])->name('locations.plantation-drive');

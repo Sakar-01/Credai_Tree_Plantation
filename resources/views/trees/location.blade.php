@@ -42,8 +42,11 @@
             <div class="row mb-4">
                 <div class="col-md-12">
                     <div class="card">
-                        <div class="card-header">
+                        <div class="card-header d-flex justify-content-between align-items-center">
                             <h5><i class="fas fa-map-marker-alt"></i> Location Details</h5>
+                            <a href="{{ route('locations.edit', $location) }}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-edit"></i> Edit Location
+                            </a>
                         </div>
                         <div class="card-body">
                             <div class="row">

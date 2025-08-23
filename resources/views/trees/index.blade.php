@@ -85,8 +85,11 @@
                                         @endif
                                     </div> --}}
                                 </div>
-                                <div class="card-footer bg-transparent">
-                                    <small class="text-muted">Click to view trees in this location</small>
+                                <div class="card-footer bg-transparent d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">Click to view trees</small>
+                                    <a href="{{ route('locations.edit', $location) }}" class="btn btn-outline-primary btn-sm" onclick="event.stopPropagation();">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
                                 </div>
                             </div>
                         </div>

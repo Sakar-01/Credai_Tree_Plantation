@@ -271,6 +271,55 @@ class LocationController extends Controller
         return redirect()->route('plantations.show', $plantation)
             ->with('success', "Plantation drive created successfully in {$location->name}! {$validated['tree_count']} trees have been planted.");
     }
+
+    public function edit(Location $location)
+    {
+        return view('locations.edit', compact('location'));
+    }
+
+    public function update(Request $request, Location $location)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:102400',
+            'remove_images' => 'nullable|array',
+            'remove_images.*' => 'nullable|string'
+        ]);
+
+
+        // Handle image removal
+        $currentImages = $location->images ?? [];
+        $removeImages = array_filter($validated['remove_images'] ?? [], function($image) {
+            return !empty($image);
+        });
+        
+        foreach ($removeImages as $imageToRemove) {
+            // Remove from storage
+            if (Storage::disk('public')->exists($imageToRemove)) {
+                Storage::disk('public')->delete($imageToRemove);
+            }
+            // Remove from array
+            $currentImages = array_filter($currentImages, function($image) use ($imageToRemove) {
+                return $image !== $imageToRemove;
+            });
+        }
+
+        // Handle new image uploads
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $path = $image->store('location-images', 'public');
+                $currentImages[] = $path;
+            }
+        }
+
+        // Update location
+        $location->update([
+            'name' => $validated['name'],
+            'images' => array_values($currentImages), // Re-index array
+        ]);
+
+        return redirect()->route('trees.location', $location)->with('success', 'Location updated successfully!');
+    }
     
     /**
      * Calculate distance between two coordinates in meters using Haversine formula
