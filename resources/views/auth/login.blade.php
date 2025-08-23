@@ -6,179 +6,301 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'Credai') }} - Login</title>
     <link rel="dns-prefetch" href="//fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
+    <link href="https://fonts.bunny.net/css?family=Inter:400,500,600,700" rel="stylesheet">
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <script src="{{ asset('js/app.js') }}" defer></script>
 </head>
 <body>
 <style>
-    body, html {
+    * {
         margin: 0;
         padding: 0;
+        box-sizing: border-box;
+    }
+    
+    body, html {
         height: 100%;
+        font-family: 'Inter', sans-serif;
         overflow-x: hidden;
     }
     
-    .login-bg {
+    .login-container {
         background-image: url('{{ asset('images/login-bg.jpg') }}');
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
         height: 100vh;
-        width: 100vw;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
         position: relative;
     }
     
-    .login-bg::before {
+    .login-container::before {
         content: '';
         position: absolute;
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(0, 0, 0, 0.4);
+        background: rgba(0, 0, 0, 0.3);
         z-index: 1;
     }
     
-    .login-form-container {
+    .login-card {
+        background: rgba(255, 255, 255, 0.65);
+        backdrop-filter: blur(20px) saturate(150%);
+        -webkit-backdrop-filter: blur(20px) saturate(150%);
+        border-radius: 24px;
+        padding: 32px;
+        width: 100%;
+        max-width: 420px;
+        box-shadow: 
+            0 8px 32px rgba(31, 38, 135, 0.25),
+            inset 0 1px 0 rgba(255, 255, 255, 0.5);
         position: relative;
         z-index: 2;
+        border: 1px solid rgba(255, 255, 255, 0.3);
     }
     
-    .login-card {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
+    .brand-logo {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 24px;
+    }
+    
+    .brand-logo img {
+        height: 50px;
+        width: auto;
+    }
+    
+    .welcome-text {
+        text-align: center;
+        margin-bottom: 32px;
+    }
+    
+    .welcome-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: #065f46;
+        margin-bottom: 6px;
+    }
+    
+    .welcome-subtitle {
+        font-size: 16px;
+        color: #047857;
+        font-weight: 400;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-label {
+        display: block;
+        font-size: 16px;
+        font-weight: 500;
+        color: #065f46;
+        margin-bottom: 8px;
+    }
+    
+    .form-input {
+        width: 100%;
+        padding: 16px 20px;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        border-radius: 12px;
+        font-size: 16px;
+        background: rgba(255, 255, 255, 0.5);
+        backdrop-filter: blur(12px) saturate(110%);
+        -webkit-backdrop-filter: blur(12px) saturate(110%);
+        transition: all 0.2s ease;
+        color: #374151;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    }
+    
+    .form-input:focus {
+        outline: none;
+        border-color: rgba(16, 185, 129, 0.6);
+        background: rgba(255, 255, 255, 0.65);
+        box-shadow: 
+            inset 0 1px 0 rgba(255, 255, 255, 0.5),
+            0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
+    
+    .form-input.error {
+        border-color: #ef4444;
+    }
+    
+    .login-btn {
+        width: 100%;
+        padding: 16px;
+        background: #10b981;
+        color: white;
         border: none;
-        border-radius: 15px;
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        border-radius: 12px;
+        font-size: 18px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 8px;
     }
     
-    @media (max-width: 768px) {
-        .login-form-container {
-            padding: 0 15px;
+    .login-btn:hover {
+        background: #059669;
+        transform: translateY(-1px);
+        box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+    }
+    
+    .register-link {
+        text-align: right;
+        margin-top: 24px;
+    }
+    
+    .register-link a {
+        color: #6b7280;
+        text-decoration: underline;
+        font-size: 14px;
+    }
+    
+    .product-by {
+        text-align: center;
+        margin-top: 24px;
+        padding-top: 20px;
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    
+    .product-by-text {
+        font-size: 12px;
+        color: #9ca3af;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .product-by img {
+        height: 32px;
+        width: auto;
+    }
+    
+    .error-message {
+        color: #ef4444;
+        font-size: 14px;
+        margin-top: 4px;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 640px) {
+        .login-container {
+            padding: 16px;
+        }
+        
+        .login-card {
+            padding: 32px 24px;
+            border-radius: 20px;
+        }
+        
+        .welcome-title {
+            font-size: 28px;
+        }
+        
+        .welcome-subtitle {
+            font-size: 16px;
+        }
+        
+        .form-input {
+            padding: 14px 16px;
+        }
+        
+        .login-btn {
+            padding: 14px;
+            font-size: 16px;
         }
     }
     
-    .password-toggle-btn {
-        background: transparent !important;
-        border: none !important;
-        color: #6c757d;
-        padding: 0.375rem 0.5rem;
+    @media (max-width: 480px) {
+        .login-card {
+            padding: 24px 20px;
+        }
+        
+        .welcome-title {
+            font-size: 24px;
+        }
     }
     
-    .password-toggle-btn:hover {
-        color: #495057;
-        background: transparent !important;
-    }
-    
-    .password-toggle-btn:focus {
-        box-shadow: none !important;
-        background: transparent !important;
+    @media (min-width: 1024px) {
+        .login-card {
+            max-width: 550px;
+            padding: 48px 56px;
+        }
     }
 </style>
 
-<div class="login-bg d-flex justify-content-center align-items-center">
-    <div class="login-form-container col-12 col-sm-8 col-md-6 col-lg-4">
-        <div class="card login-card shadow-lg">
-            <div class="card-header bg-transparent border-0 text-center py-4">
-                <img src="{{ asset('images/logo.png') }}" alt="Credai" class="mb-3" style="max-height: 80px; width: auto;">
-                {{-- <h4 class="mb-0 text-dark fw-bold">{{ __('Login') }}</h4> --}}
+<div class="login-container">
+    <div class="login-card">
+        <div class="brand-logo">
+            <img src="{{ asset('images/logo.png') }}" alt="Credai">
+        </div>
+        
+        <div class="welcome-text">
+            <h1 class="welcome-title">Welcome Back!</h1>
+            <p class="welcome-subtitle">Let's Login to Your Account</p>
+        </div>
+        
+        <form method="POST" action="{{ route('login') }}">
+            @csrf
+            
+            <div class="form-group">
+                <label for="email" class="form-label">Username</label>
+                <input 
+                    id="email" 
+                    type="email" 
+                    class="form-input @error('email') error @enderror" 
+                    name="email" 
+                    value="{{ old('email') }}" 
+                    required 
+                    autocomplete="email" 
+                    autofocus
+                >
+                @error('email')
+                    <div class="error-message">{{ $message }}</div>
+                @enderror
             </div>
-
-            <div class="card-body p-4">
-                <form method="POST" action="{{ route('login') }}">
-                    @csrf
-
-                    <div class="mb-3">
-                        <label for="email" class="form-label">{{ __('Email Address') }}</label>
-                        <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
-
-                        @error('email')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="password" class="form-label">{{ __('Password') }}</label>
-                        <div class="position-relative">
-                            <input id="password" type="password" class="form-control @error('password') is-invalid @enderror pe-5" name="password" required autocomplete="current-password">
-                            <button type="button" class="btn password-toggle-btn position-absolute top-50 end-0 translate-middle-y me-2" id="togglePassword">
-                                <i class="fas fa-eye" id="passwordIcon"></i>
-                            </button>
-                        </div>
-
-                        @error('password')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
-                    </div>
-
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
-                            <label class="form-check-label" for="remember">
-                                {{ __('Remember Me') }}
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="d-grid mb-3">
-                        <button type="submit" class="btn btn-primary">
-                            {{ __('Login') }}
-                        </button>
-                    </div>
-
-                    {{-- @if (Route::has('password.request'))
-                        <div class="text-center">
-                            <a class="btn btn-link" href="{{ route('password.request') }}">
-                                {{ __('Forgot Your Password?') }}
-                            </a>
-                        </div>
-                    @endif --}}
-                </form>
-<!-- Add this block for "Product by" -->
-<div class="text-center mt-4">
-    <small class="text-muted">Product by</small><br>
-    <img src="{{ asset('images/whennex.png') }}" alt="Whennex Logo" style="max-height: 40px;">
-</div>
-                {{-- volunteer@treeplantation.org password123 <br/>
-                admin@treeplantation.org password123 --}}
+            
+            <div class="form-group">
+                <label for="password" class="form-label">Password</label>
+                <input 
+                    id="password" 
+                    type="password" 
+                    class="form-input @error('password') error @enderror" 
+                    name="password" 
+                    required 
+                    autocomplete="current-password"
+                >
+                @error('password')
+                    <div class="error-message">{{ $message }}</div>
+                @enderror
             </div>
+            
+            <button type="submit" class="login-btn">
+                LOGIN
+            </button>
+            
+            {{-- <div class="register-link">
+                <span style="color: #6b7280; font-size: 14px;">Don't have an account?</span>
+                <a href="#" style="margin-left: 8px;">Register now</a>
+            </div> --}}
+        </form>
+        
+        <div class="product-by">
+            <div class="product-by-text">PRODUCT BY</div>
+            <img src="{{ asset('images/whennex.png') }}" alt="Whennex">
         </div>
     </div>
 </div>
-
-<script>
-// Password visibility toggle functionality
-document.addEventListener('DOMContentLoaded', function() {
-    const togglePassword = document.getElementById('togglePassword');
-    const passwordField = document.getElementById('password');
-    const passwordIcon = document.getElementById('passwordIcon');
-
-    if (togglePassword && passwordField && passwordIcon) {
-        togglePassword.addEventListener('click', function() {
-            // Toggle the password field type
-            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordField.setAttribute('type', type);
-            
-            // Toggle the icon
-            if (type === 'password') {
-                passwordIcon.classList.remove('fa-eye-slash');
-                passwordIcon.classList.add('fa-eye');
-            } else {
-                passwordIcon.classList.remove('fa-eye');
-                passwordIcon.classList.add('fa-eye-slash');
-            }
-        });
-    }
-});
-</script>
-
-<!-- Include Font Awesome for eye icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 </body>
 </html>
