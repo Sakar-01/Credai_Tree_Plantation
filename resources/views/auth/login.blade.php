@@ -7,6 +7,7 @@
     <title>{{ config('app.name', 'Credai') }} - Login</title>
     <link rel="dns-prefetch" href="//fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Inter:400,500,600,700" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <script src="{{ asset('js/app.js') }}" defer></script>
 </head>
@@ -192,6 +193,33 @@
         margin-top: 4px;
     }
     
+    .password-field {
+        position: relative;
+    }
+    
+    .password-toggle {
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #6b7280;
+        font-size: 16px;
+        cursor: pointer;
+        padding: 4px;
+        border-radius: 4px;
+        transition: color 0.2s ease;
+    }
+    
+    .password-toggle:hover {
+        color: #065f46;
+    }
+    
+    .password-field .form-input {
+        padding-right: 50px;
+    }
+    
     /* Responsive Design */
     @media (max-width: 640px) {
         .login-container {
@@ -272,14 +300,19 @@
             
             <div class="form-group">
                 <label for="password" class="form-label">Password</label>
-                <input 
-                    id="password" 
-                    type="password" 
-                    class="form-input @error('password') error @enderror" 
-                    name="password" 
-                    required 
-                    autocomplete="current-password"
-                >
+                <div class="password-field">
+                    <input 
+                        id="password" 
+                        type="password" 
+                        class="form-input @error('password') error @enderror" 
+                        name="password" 
+                        required 
+                        autocomplete="current-password"
+                    >
+                    <button type="button" class="password-toggle" onclick="togglePassword()">
+                        <i class="fas fa-eye" id="password-eye"></i>
+                    </button>
+                </div>
                 @error('password')
                     <div class="error-message">{{ $message }}</div>
                 @enderror
@@ -301,6 +334,21 @@
         </div>
     </div>
 </div>
+
+<script>
+function togglePassword() {
+    const passwordField = document.getElementById('password');
+    const passwordEye = document.getElementById('password-eye');
+    
+    if (passwordField.type === 'password') {
+        passwordField.type = 'text';
+        passwordEye.className = 'fas fa-eye-slash';
+    } else {
+        passwordField.type = 'password';
+        passwordEye.className = 'fas fa-eye';
+    }
+}
+</script>
 
 </body>
 </html>

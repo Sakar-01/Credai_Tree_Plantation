@@ -113,23 +113,18 @@
     transition: all 0.3s ease;
 }
 
-.carousel-control-prev, .carousel-control-next {
-    width: 5%;
-    opacity: 0.7;
-}
-
-.carousel-control-prev:hover, .carousel-control-next:hover {
-    opacity: 1;
-}
-
-.carousel-indicators {
-    margin-bottom: 5px;
-}
-
-.carousel-indicators [data-bs-target] {
-    width: 8px;
-    height: 8px;
+.location-card .carousel-control-prev, 
+.location-card .carousel-control-next {
+    background: rgba(0, 0, 0, 0.6);
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
+}
+
+.location-card .carousel-control-prev-icon, 
+.location-card .carousel-control-next-icon {
+    width: 12px;
+    height: 12px;
 }
 
 .card-img-top {

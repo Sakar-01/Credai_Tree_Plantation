@@ -22,11 +22,18 @@
                         </p>
                     @endif
                 </div>
-                <div>
-                    <a href="{{ route('locations.plant-tree', $location->id) }}" class="btn btn-primary me-2">Plant New Tree</a>
-                    <a href="{{ route('locations.plantation-drive', $location->id) }}" class="btn btn-success me-2">Create Plantation Drive</a>
+                <div class="header-buttons">
+                    <a href="{{ route('locations.plant-tree', $location->id) }}" class="btn btn-primary">
+                        <i class="fas fa-seedling"></i>
+                        <span class="btn-text">Plant New Tree</span>
+                    </a>
+                    <a href="{{ route('locations.plantation-drive', $location->id) }}" class="btn btn-success">
+                        <i class="fas fa-leaf"></i>
+                        <span class="btn-text">Create Plantation Drive</span>
+                    </a>
                     <a href="{{ route('inspections.upcoming.location', $location->id) }}" class="btn btn-warning">
-                        <i class="fas fa-calendar-check"></i> Upcoming Inspections
+                        <i class="fas fa-calendar-check"></i>
+                        <span class="btn-text">Upcoming Inspections</span>
                     </a>
                 </div>
             </div>
@@ -45,7 +52,8 @@
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h5><i class="fas fa-map-marker-alt"></i> Location Details</h5>
                             <a href="{{ route('locations.edit', $location) }}" class="btn btn-outline-primary btn-sm">
-                                <i class="fas fa-edit"></i> Edit Location
+                                <i class="fas fa-edit"></i>
+                                <span class="btn-text">Edit Location</span>
                             </a>
                         </div>
                         <div class="card-body">
@@ -169,7 +177,12 @@
                                 <i class="fas fa-tree fa-3x text-muted mb-3"></i>
                                 <h4>No individual trees found</h4>
                                 <p class="text-muted">Plant your first individual tree in this location!</p>
-                                <a href="{{ route('locations.plant-tree', $location->id) }}" class="btn btn-primary">Plant a Tree</a>
+                                <div class="action-buttons">
+                                    <a href="{{ route('locations.plant-tree', $location->id) }}" class="btn btn-primary">
+                                        <i class="fas fa-seedling"></i>
+                                        <span class="btn-text">Plant a Tree</span>
+                                    </a>
+                                </div>
                             </div>
                         @endif
                     </div>
@@ -242,9 +255,12 @@
                                                 </div>
                                             </div>
                                             <div class="card-footer">
-                                                <a href="{{ route('plantations.show', $drive) }}" class="btn btn-primary btn-sm">
-                                                    <i class="fas fa-eye"></i> View Details
-                                                </a>
+                                                <div class="card-actions">
+                                                    <a href="{{ route('plantations.show', $drive) }}" class="btn btn-primary btn-sm">
+                                                        <i class="fas fa-eye"></i>
+                                                        <span class="btn-text">View Details</span>
+                                                    </a>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -258,7 +274,12 @@
                                 <i class="fas fa-seedling fa-3x text-muted mb-3"></i>
                                 <h4>No plantation drives found</h4>
                                 <p class="text-muted">Create your first plantation drive in this location!</p>
-                                <a href="{{ route('plantations.create') }}?location_id={{ $location->id }}" class="btn btn-success">Create Plantation Drive</a>
+                                <div class="action-buttons">
+                                    <a href="{{ route('plantations.create') }}?location_id={{ $location->id }}" class="btn btn-success">
+                                        <i class="fas fa-leaf"></i>
+                                        <span class="btn-text">Create Plantation Drive</span>
+                                    </a>
+                                </div>
                             </div>
                         @endif
                     </div>
@@ -281,9 +302,15 @@
                                 <i class="fas fa-tree fa-3x text-muted mb-3"></i>
                                 <h4>No trees found in this location</h4>
                                 <p class="text-muted">Be the first to plant trees here!</p>
-                                <div>
-                                    <a href="{{ route('locations.plant-tree', $location->id) }}" class="btn btn-primary me-2">Plant a Tree</a>
-                                    <a href="{{ route('plantations.create') }}?location_id={{ $location->id }}" class="btn btn-success">Create Plantation Drive</a>
+                                <div class="action-buttons">
+                                    <a href="{{ route('locations.plant-tree', $location->id) }}" class="btn btn-primary">
+                                        <i class="fas fa-seedling"></i>
+                                        <span class="btn-text">Plant a Tree</span>
+                                    </a>
+                                    <a href="{{ route('plantations.create') }}?location_id={{ $location->id }}" class="btn btn-success">
+                                        <i class="fas fa-leaf"></i>
+                                        <span class="btn-text">Create Plantation Drive</span>
+                                    </a>
                                 </div>
                             </div>
                         @endif
