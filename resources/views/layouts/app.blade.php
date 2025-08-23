@@ -1115,6 +1115,7 @@
             gap: 0 !important;
         }
         
+        
         /* Animation Classes */
         .fade-in {
             animation: fadeIn 0.5s ease-out;
